@@ -8,8 +8,17 @@
 :- dynamic utente/4.
 :- dynamic prestador/4.
 :- dynamic cuidado/5.
-% -------------------------------------------------------
-% Funções auxiliares
+
+
+unicos([],[]).
+unicos([H|T], R) :-
+	member(H,T),
+	unicos(T,R).
+unicos([H|T], [H|R]) :-
+	not(member(H,T)),
+	unicos(T,R).
+
+
 comprimento([H],1).
 comprimento([H|T],N) :- comprimento(T,M), N is M+1.
 
@@ -78,9 +87,22 @@ apagar(T) :- assert(T),!,fail.
 % ------------------------------------------------------
 %  Identificar utentes (Critérios de seleção):
 %
-
+%
 %  Identificar utentes de um prestador/especialidade/instituição:
 %
+utentes_de(P,E,I,S):-
+  solucoes(
+    (IdU,Nome,Idade,Morada),
+    (
+      cuidado(_,IdU,IdP,_,_),
+      prestador(IdP,P,E,I),
+      utente(IdU,Nome,Idade,Morada)
+    ),
+   L
+  ),
+  unicos(L,S).
+
+
 
 % ------------------------------------------------------
 %  Identificar as instituições:
@@ -92,6 +114,16 @@ apagar(T) :- assert(T),!,fail.
 
 %  Identificar cuidados de saúde realizados por utente/instituição/prestador
 %
+cuidados_saude(U,I,P,S):-
+  solucoes(
+    (Data,Descricao,Custo),
+    (
+      cuidado(Data,IdU,IdP,Descricao,Custo),
+      prestador(IdP,P,E,I),
+      utente(IdU,U,_,_)
+    ),
+   S
+ ).
 
 % ------------------------------------------------------
 %  Determinar todas as instituições/prestadores a que um utente já recorreu:
