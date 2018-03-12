@@ -90,7 +90,7 @@ apagar(T) :- assert(T),!,fail.
 %
 %  Identificar utentes de um prestador/especialidade/instituição:
 %
-utentes_de(P,E,I,S):-
+utentes_pei(P,E,I,S):-
   solucoes(
     (IdU,Nome,Idade,Morada),
     (
@@ -103,7 +103,41 @@ utentes_de(P,E,I,S):-
   unicos(L,S).
 
 
+utentes_p(P,S):-
+  solucoes(
+    (IdU,Nome,Idade,Morada),
+    (
+      cuidado(_,IdU,IdP,_,_),
+      prestador(IdP,P,_,_),
+      utente(IdU,Nome,Idade,Morada)
+    ),
+   L
+  ),
+  unicos(L,S).
 
+utentes_e(E,S):-
+  solucoes(
+    (IdU,Nome,Idade,Morada),
+    (
+      cuidado(_,IdU,IdP,_,_),
+      prestador(IdP,_,E,_),
+      utente(IdU,Nome,Idade,Morada)
+    ),
+   L
+  ),
+  unicos(L,S).
+
+utentes_i(I,S):-
+  solucoes(
+    (IdU,Nome,Idade,Morada),
+    (
+      cuidado(_,IdU,IdP,_,_),
+      prestador(IdP,_,_,I),
+      utente(IdU,Nome,Idade,Morada)
+    ),
+   L
+  ),
+  unicos(L,S).
 % ------------------------------------------------------
 %  Identificar as instituições:
 %
@@ -119,12 +153,44 @@ cuidados_saude(U,I,P,S):-
     (Data,Descricao,Custo),
     (
       cuidado(Data,IdU,IdP,Descricao,Custo),
-      prestador(IdP,P,E,I),
+      prestador(IdP,P,_,I),
       utente(IdU,U,_,_)
     ),
    S
  ).
 
+cuidados_saude_u(U,S):-
+  solucoes(
+    (Data,Descricao,Custo),
+    (
+      cuidado(Data,IdU,IdP,Descricao,Custo),
+      prestador(IdP,_,_,_),
+      utente(IdU,U,_,_)
+    ),
+   S
+ ).
+
+cuidados_saude_i(I,S):-
+  solucoes(
+    (Data,Descricao,Custo),
+    (
+      cuidado(Data,IdU,IdP,Descricao,Custo),
+      prestador(IdP,_,_,I),
+      utente(IdU,_,_,_)
+    ),
+   S
+ ).
+
+cuidados_saude_p(P,S):-
+  solucoes(
+    (Data,Descricao,Custo),
+    (
+      cuidado(Data,IdU,IdP,Descricao,Custo),
+      prestador(IdP,P,_,_),
+      utente(IdU,_,_,_)
+    ),
+   S
+ ).
 % ------------------------------------------------------
 %  Determinar todas as instituições/prestadores a que um utente já recorreu:
 %
