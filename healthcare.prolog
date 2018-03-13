@@ -12,14 +12,17 @@
 % -------------------------------------------------------
 % Predicados auxiliares
 
-pertence(H,[H|T]).
-pertence(X,[H|T]) :-
+% Elemento, Lista -> {V,F}
+pertence(H,[H|_T]).
+pertence(X,[H|_T]) :-
 	X \= H,
-pertence(X,T).
+pertence(X,_T).
 
-nao(Q) :- Q,!,false.
-nao(Q).
+% Predicado -> {V,F}
+nao(_Q) :- _Q,!,false.
+nao(_Q).
 
+% Lista1, Lista2 -> {V,F}
 unicos([],[]).
 unicos([H|T], R) :-
 	pertence(H,T),
@@ -28,11 +31,16 @@ unicos([H|T], [H|R]) :-
 	nao(pertence(H,T)),
 	unicos(T,R).
 
+% Lista, Comprimento -> {V,F}
+comprimento([_H],1).
+comprimento([_H|T],N) :- comprimento(T,M), N is M+1.
 
-comprimento([H],1).
-comprimento([H|T],N) :- comprimento(T,M), N is M+1.
-
+% Termo, Predicado, Lista -> {V,F}
 solucoes(T,Q,S) :- findall(T,Q,S).
+
+% Lista, Valor -> {V,F}
+soma([],0).
+soma([N|Ns], T) :- soma(Ns,X), T is X+N.
 % -------------------------------------------------------
 % Factos
 utente(1, mario_silva, 18, faro).
@@ -68,7 +76,7 @@ testa([H|T]) :- H, testa(T).
                                  comprimento( S,N ),
 				                 N==1).
 
-+prestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (utente(Id,Nome,Especialidade,Local)),S ),
++prestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,Nome,Especialidade,Local)),S ),
                                             comprimento( S,N ),
 				                            N==1).
 
@@ -76,13 +84,24 @@ testa([H|T]) :- H, testa(T).
                                                 comprimento( S,N ),
 				                                N==1).
 
-% Invariante Estrutural:  não permitir a remoção de utentes/prestadores
-%                         que têm um cuidado associado
--utente(IdUt,Nome,Idade,Local) :: (solucoes( (IdUt),(cuidado(Data,IdUt,IdPrest,Descricao,Custo)),S ),
+
+% Invariante Referencial : não permitir a inserção de utentes/prestadores com o mesmo ID
++utente(Id,_,_,_) :: (solucoes( (Id,Nome,Idade,Local), (utente(Id,Nome,Idade,Local)),S ),
+                                 comprimento( S,N ),
+				                 N==1).
+
++prestador(Id,_,_,_) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,Nome,Especialidade,Local)),S ),
+                                         comprimento( S,N ),
+   			                             N==1).
+
+
+% Invariante Referencial:  não permitir a remoção de utentes/prestadores
+%                          que têm um cuidado associado
+-utente(IdUt,_,_,_) :: (solucoes( (IdUt),(cuidado(_,IdUt,_,_,_)),S ),
                                   comprimento( S,N ),
 				                  N==0).
 
--prestador(IdPrest,Nome,Especialidade,Local) :: (solucoes( (IdPrest,Nome,Especialidade,Local), cuidado(Data,IdUt,IdPrest,Descricao,Custo),S ),
+-prestador(IdPrest,Nome,Especialidade,Local) :: (solucoes( (IdPrest,Nome,Especialidade,Local), cuidado(_,_,IdPrest,_,_),S ),
                                                 comprimento( S,N ),
 				                                N==0).
 % ------------------------------------------------------
@@ -229,7 +248,31 @@ instituicoes_Local_U(U,S):-
 % ------------------------------------------------------
 %  Identificar os cuidados de saúde prestados por instituição/cidade/datas:
 %
+cuidados_por_instituicao(Instituicao,S) :-
+    solucoes(
+        (Data, Descricao, Custo),
+        (
+            prestador(IdP,_,_,Instituicao),
+            cuidado(Data,_,IdP,Descricao,Custo)
+        ),
+        S
+    ).
 
+cuidados_por_cidade(Cidade,S) :-
+    solucoes(
+        (Data, Descricao,Custo),
+        (
+            utente(IdU,_,_,Cidade),
+            cuidado(Data,IdU,_,Descricao,Custo)
+        ),
+        S
+    ).
+
+cuidados_por_data(Data,S) :-
+    solucoes(
+        (Data, Descricao,Custo),
+        (cuidado(Data,_,_,Descricao,Custo)),
+        S).
 
 %  Identificar cuidados de saúde realizados por utente/instituição/prestador
 %
@@ -285,5 +328,41 @@ instituicoes_prestadores(U,S):-
     unicos(L,S).
 
 % ------------------------------------------------------
-%  TANIA Calcular o custo total dos cuidados de saúde por utente/especialidade/prestador/datas:
+% Calcular o custo total dos cuidados de saúde por utente/especialidade/prestador/datas:
 %
+custo_por_utente(IdU,C) :-
+    solucoes(
+        Custo,
+        (
+            cuidado(_,IdU,_,_,Custo)
+        )
+        S),
+    soma(S,C).
+
+custo_por_prestador(IdP,C) :-
+    solucoes(
+        Custo,
+        (
+            cuidado(_,_,IdP,_,Custo)
+        )
+        S),
+    soma(S,C).
+
+custo_por_datas(Data,C) :-
+    solucoes(
+        Custo,
+        (
+            cuidado(Data,_,_,_,Custo)
+        )
+        S),
+    soma(S,C).
+
+custo_por_especialidade(Especialidade,C) :-
+    solucoes(
+        Custo,
+        (
+            prestador(IdP,_,Especialidade,_),
+            cuidado(_,_,IdP,_,Custo)
+        )
+        S),
+    soma(S,C).
