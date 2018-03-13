@@ -9,13 +9,23 @@
 :- dynamic prestador/4.
 :- dynamic cuidado/5.
 
+% -------------------------------------------------------
+% Predicados auxiliares
+
+pertence(H,[H|T]).
+pertence(X,[H|T]) :-
+	X \= H,
+pertence(X,T).
+
+nao(Q) :- Q,!,false.
+nao(Q).
 
 unicos([],[]).
 unicos([H|T], R) :-
-	member(H,T),
+	pertence(H,T),
 	unicos(T,R).
 unicos([H|T], [H|R]) :-
-	not(member(H,T)),
+	nao(pertence(H,T)),
 	unicos(T,R).
 
 
@@ -35,10 +45,10 @@ prestador(2, dr_marisa_silva, medicina_geral, santo_antonio).
 prestador(3, dr_bruno_ferreira, cardiologia, santa_maria).
 prestador(4, dr_fernanda_moreira, cirurgia_geral, cufe).
 
-cuidado(22-03-2008,1,2,constipacao,15).
-cuidado(03-05-2015,2,3,arritmia,45).
-cuidado(17-09-2003,3,1,eczema,30).
-cuidado(30-12-2017,4,4,hernia,150).
+cuidado(2008-03-22,1,2,constipacao,15).
+cuidado(2015-05-03,2,3,arritmia,45).
+cuidado(2003-09-17,3,1,eczema,30).
+cuidado(2017-12-30,4,4,hernia,150).
 % -------------------------------------------------------
 %  Registar utentes, prestadores e cuidados de saúde:
 %
@@ -85,9 +95,43 @@ remove(T) :- solucoes(I,-T::I,S),
 apagar(T) :- retract(T).
 apagar(T) :- assert(T),!,fail.
 % ------------------------------------------------------
-%  Identificar utentes (Critérios de seleção): -Sérgio
-%
-%
+%  Identificar utentes (Critérios de seleção):
+
+identificar_utente_Id(Id,S):-
+  solucoes(
+          (Id,Nome,Idade,Local),
+          (utente(Id,Nome,Idade,Local)),
+          S
+          ).
+
+
+identificar_utente_Nome(Nome,S):-
+  solucoes(
+          (Id,Nome,Idade,Local),
+          (utente(Id,Nome,Idade,Local)),
+          S
+          ).
+
+identificar_utente_Idade(Idade,S):-
+  solucoes(
+          (Id,Nome,Idade,Local),
+          (utente(Id,Nome,Idade,Local)),
+          S
+          ).
+
+identificar_utente_Local(Local,S):-
+  solucoes(
+          (Id,Nome,Idade,Local),
+          (utente(Id,Nome,Idade,Local)),
+          S
+          ).
+
+identificar_utente_Nome_Idade_Local(Nome,Idade,Local,S):-
+  solucoes(
+          (Id,Nome,Idade,Local),
+          (utente(Id,Nome,Idade,Local)),
+          S
+          ).
 %  Identificar utentes de um prestador/especialidade/instituição:
 %
 utentes_pei(P,E,I,S):-
@@ -101,7 +145,6 @@ utentes_pei(P,E,I,S):-
    L
   ),
   unicos(L,S).
-
 
 utentes_p(P,S):-
   solucoes(
@@ -138,21 +181,55 @@ utentes_i(I,S):-
    L
   ),
   unicos(L,S).
+
 % ------------------------------------------------------
 %  Identificar as instituições: -Sérgio
 %
-%instituicoes([H|T]):-
-%    prestador(A,B,C,H),
-%    instituicoes(T).
 
-instituicoes_todas(L):-
-    solucoes(I, prestador(A,B,C,I), L).
+%Lista de todas as instituições no sistema
+instituicoes(S):-
+    solucoes(I, prestador(A,B,C,I), L),
+    unicos(L,S).
 
-instituicoes_todas(ID, S):-
-        solucoes(I, prestador(ID,B,C,I), L).
+%ID do prestador, lista das instituições desse prestador    
+instituicoes_ID_P(ID, S):-
+    solucoes(I, prestador(ID,B,C,I), L),
+    unicos(L,S).
+
+%Nome do prestador, lista das instituições que os prestadores com esse nome já visitaram   
+instituicoes_Nome_P(N, S):-
+    solucoes(I, prestador(A,N,C,I), L),
+    unicos(L,S).
+
+%Área do prestador, lista das instituições que os utentes dessa área já visitaram 
+instituicoes_Area_P(A, S):-
+    solucoes(I, prestador(B,C,A,I), L),
+    unicos(L,S).
+    
+%ID do utente, lista das instituições que esse utente já visitou
+instituicoes_ID_U(U,S):-
+    solucoes(I,(cuidado(D,U,P,O,M),prestador(P,N,A,I)),L),
+    unicos(L,S).
+
+%Nome do utente, lista das instituições já visitadas pelos utentes com esse nome  
+instituicoes_Nome_U(U,S):-
+    solucoes(I,(utente(ID,U,IDA,LO),cuidado(D,ID,P,O,M),prestador(P,N,A,I)),L),
+    unicos(L,S).
+
+%Idade do utente, lista das instituições que os utentes com essa idade já visitaram
+instituicoes_Idade_U(U,S):-
+    solucoes(I,(utente(ID,NO,U,LO),cuidado(D,ID,P,O,M),prestador(P,N,A,I)),L),
+    unicos(L,S).
+
+%Local do utente, lista das instituições que os utentes desse local já visitaram
+instituicoes_Local_U(U,S):-
+    solucoes(I,(utente(ID,NO,IDA,U),cuidado(D,ID,P,O,M),prestador(P,N,A,I)),L),
+    unicos(L,S).
+
 % ------------------------------------------------------
 %  Identificar os cuidados de saúde prestados por instituição/cidade/datas:
 %
+
 
 %  Identificar cuidados de saúde realizados por utente/instituição/prestador
 %
@@ -202,7 +279,11 @@ cuidados_saude_p(P,S):-
 % ------------------------------------------------------
 %  Determinar todas as instituições/prestadores a que um utente já recorreu: -Sérgio
 %
+%ID do utente, Lista com os pares (instuição, nome do prestador) que esse utente já visitou
+instituicoes_prestadores(U,S):-
+    solucoes((I,NO),(cuidado(D,U,P,O,M),prestador(P,NO,A,I)),L),
+    unicos(L,S).
 
 % ------------------------------------------------------
-%  Calcular o custo total dos cuidados de saúde por utente/especialidade/prestador/datas:
+%  TANIA Calcular o custo total dos cuidados de saúde por utente/especialidade/prestador/datas:
 %
