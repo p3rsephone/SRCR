@@ -86,8 +86,42 @@ apagar(T) :- retract(T).
 apagar(T) :- assert(T),!,fail.
 % ------------------------------------------------------
 %  Identificar utentes (Critérios de seleção):
-%
-%
+
+identificar_utente_Id(Id,S):-
+  solucoes(
+          (Id,Nome,Idade,Local),
+          (utente(Id,Nome,Idade,Local)),
+          S
+          ).
+
+
+identificar_utente_Nome(Nome,S):-
+  solucoes(
+          (Id,Nome,Idade,Local),
+          (utente(Id,Nome,Idade,Local)),
+          S
+          ).
+
+identificar_utente_Idade(Idade,S):-
+  solucoes(
+          (Id,Nome,Idade,Local),
+          (utente(Id,Nome,Idade,Local)),
+          S
+          ).
+
+identificar_utente_Local(Local,S):-
+  solucoes(
+          (Id,Nome,Idade,Local),
+          (utente(Id,Nome,Idade,Local)),
+          S
+          ).
+
+identificar_utente_Nome_Idade_Local(Nome,Idade,Local,S):-
+  solucoes(
+          (Id,Nome,Idade,Local),
+          (utente(Id,Nome,Idade,Local)),
+          S
+          ).
 %  Identificar utentes de um prestador/especialidade/instituição:
 %
 utentes_pei(P,E,I,S):-
