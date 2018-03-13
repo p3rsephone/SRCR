@@ -7,7 +7,7 @@
 :- op(900,xfy,'::').
 :- dynamic utente/4.
 :- dynamic prestador/4.
-:- dynamic cuidado/5.
+:- dynamic cuidado/6.
 
 % -------------------------------------------------------
 % --------------- Predicados auxiliares -----------------
@@ -88,22 +88,22 @@ prestador(10, dr_marina_almeida, ginecologia, santo_antonio).
 prestador(11, dr_andre_carvalho, oftalmologia, sao_joao).
 prestador(12, dr_yasmin_barbosa, cirurgia_geral, cufe).
 
-cuidado(2008-03-22,1,2,constipacao,15).
-cuidado(2015-05-03,2,3,arritmia,45).
-cuidado(2003-09-17,3,1,eczema,30).
-cuidado(2017-12-30,4,4,hernia,150).
-cuidado(2008-03-22,5,5,catarata,15).
-cuidado(2015-05-03,6,10,menopausa,45).
-cuidado(2003-09-17,7,7,otite,30).
-cuidado(2017-12-30,8,6,pele_irritada,150).
-cuidado(2008-03-22,9,8,fungos,15).
-cuidado(2015-05-03,10,2,constipacao,45).
-cuidado(2003-09-17,11,12,quisto,30).
-cuidado(2017-12-30,12,11,catarata,150).
-cuidado(2008-03-22,13,9,sopro_no_coracao,15).
-cuidado(2015-05-03,14,1,eczema,45).
-cuidado(2003-09-17,15,2,constipacao,30).
-cuidado(2017-12-30,16,3,arritmia,150).
+cuidado(2008-03-22,1,2,constipacao,15,60).
+cuidado(2015-05-03,2,3,arritmia,45,80).
+cuidado(2003-09-17,3,1,eczema,30,91).
+cuidado(2017-12-30,4,4,hernia,150,84).
+cuidado(2008-03-22,5,5,catarata,15,30).
+cuidado(2015-05-03,6,10,menopausa,45,42).
+cuidado(2003-09-17,7,7,otite,30,75).
+cuidado(2017-12-30,8,6,pele_irritada,150,70).
+cuidado(2008-03-22,9,8,fungos,15,60).
+cuidado(2015-05-03,10,2,constipacao,45,95).
+cuidado(2003-09-17,11,12,quisto,30,50).
+cuidado(2017-12-30,12,11,catarata,150,90).
+cuidado(2008-03-22,13,9,sopro_no_coracao,15,81).
+cuidado(2015-05-03,14,1,eczema,45,100).
+cuidado(2003-09-17,15,2,constipacao,30,70).
+cuidado(2017-12-30,16,3,arritmia,150,65).
 
 % -------------------------------------------------------
 %  Registar utentes, prestadores e cuidados de saúde:
@@ -129,7 +129,7 @@ testa([H|T]) :- H, testa(T).
                                             comprimento( S,N ),
 				                            N==1).
 
-+cuidado(Data,IdUt,IdPrest,Descricao,Custo) :: (solucoes( (Data,IdUt,IdPrest,Descricao,Custo), (cuidado(Data,IdUt,IdPrest,Descricao,Custo)),S ),
++cuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Data,IdUt,IdPrest,Descricao,Custo), (cuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating)),S ),
                                                 comprimento( S,N ),
 				                                N==1).
 
@@ -149,11 +149,11 @@ testa([H|T]) :- H, testa(T).
 % Invariante Referencial:  não permitir a remoção de utentes/prestadores
 %                          que têm um cuidado associado
 % -------------------------------------------------------
--utente(IdUt,_,_,_) :: (solucoes( (IdUt),(cuidado(_,IdUt,_,_,_)),S ),
+-utente(IdUt,_,_,_) :: (solucoes( (IdUt),(cuidado(_,IdUt,_,_,_,_)),S ),
                                   comprimento( S,N ),
 				                  N==0).
 
--prestador(IdPrest,Nome,Especialidade,Local) :: (solucoes( (IdPrest,Nome,Especialidade,Local), cuidado(_,_,IdPrest,_,_),S ),
+-prestador(IdPrest,Nome,Especialidade,Local) :: (solucoes( (IdPrest,Nome,Especialidade,Local), cuidado(_,_,IdPrest,_,_,_),S ),
                                                 comprimento( S,N ),
 				                                N==0).
 % ------------------------------------------------------
@@ -222,7 +222,7 @@ utentes_por_prestador_especialidade_instituicao(P,E,I,S):-
   solucoes(
     (IdU,Nome,Idade,Morada),
     (
-      cuidado(_,IdU,IdP,_,_),
+      cuidado(_,IdU,IdP,_,_,_),
       prestador(IdP,P,E,I),
       utente(IdU,Nome,Idade,Morada)
     ),
@@ -236,7 +236,7 @@ utentes_por_prestador(P,S):-
   solucoes(
     (IdU,Nome,Idade,Morada),
     (
-      cuidado(_,IdU,IdP,_,_),
+      cuidado(_,IdU,IdP,_,_,_),
       prestador(IdP,P,_,_),
       utente(IdU,Nome,Idade,Morada)
     ),
@@ -250,7 +250,7 @@ utentes_por_especialidade(E,S):-
   solucoes(
     (IdU,Nome,Idade,Morada),
     (
-      cuidado(_,IdU,IdP,_,_),
+      cuidado(_,IdU,IdP,_,_,_),
       prestador(IdP,_,E,_),
       utente(IdU,Nome,Idade,Morada)
     ),
@@ -264,7 +264,7 @@ utentes_por_instituicao(I,S):-
   solucoes(
     (IdU,Nome,Idade,Morada),
     (
-      cuidado(_,IdU,IdP,_,_),
+      cuidado(_,IdU,IdP,_,_,_),
       prestador(IdP,_,_,I),
       utente(IdU,Nome,Idade,Morada)
     ),
@@ -280,49 +280,49 @@ utentes_por_instituicao(I,S):-
 instituicoes(S):-
     solucoes(I, prestador(_,_,_,I), L),
     unicos(L,S).
-
+    
 % Predicado instituicoes_por_IdPrestador:
 %ID do prestador, lista das instituições desse prestador -> {V,F}
 instituicoes_por_IdPrestador(ID, S):-
     solucoes(I, prestador(ID,_,_,I), L),
     unicos(L,S).
-
+    
 % Predicado instituicoes_por_NomePrestador:
 %Nome do prestador, lista das instituições que os prestadores com esse nome já visitaram -> {V,F}
 instituicoes_por_NomePrestador(N, S):-
     solucoes(I, prestador(_,N,_,I), L),
     unicos(L,S).
-
+    
 % Predicado instituicoes_por_Especialidade:
 %Especialidade do prestador, lista das instituições que os utentes dessa área já visitaram -> {V,F}
 instituicoes_por_Especialidade(E, S):-
     solucoes(I, prestador(_,_,E,I), L),
     unicos(L,S).
-
+    
 % Predicado utentes_por_IdUtente:
 %ID do utente, lista das instituições que esse utente já visitou -> {V,F}
 instituicoes_por_IdUtente(U,S):-
-    solucoes(I,(cuidado(_,U,P,_,_),prestador(P,_,_,I)),L),
+    solucoes(I,(cuidado(_,U,P,_,_,_,_),prestador(P,_,_,I)),L),
     unicos(L,S).
-
+    
 % Predicado instituicoes_por_NomeUtente:
 %Nome do utente, lista das instituições já visitadas pelos utentes com esse nome -> {V,F}
 instituicoes_por_NomeUtente(U,S):-
-    solucoes(I,(utente(ID,U,_,_),cuidado(_,ID,P,_,_),prestador(P,_,_,I)),L),
+    solucoes(I,(utente(ID,U,_,_),cuidado(_,ID,P,_,_,_,_),prestador(P,_,_,I)),L),
     unicos(L,S).
-
+    
 % Predicado instituicoes_por_Idade:
 %Idade do utente, lista das instituições que os utentes com essa idade já visitaram -> {V,F}
 instituicoes_por_Idade(U,S):-
-    solucoes(I,(utente(ID,_,U,_),cuidado(_,ID,P,_,_),prestador(P,_,_,I)),L),
+    solucoes(I,(utente(ID,_,U,_),cuidado(_,ID,P,_,_,_,_),prestador(P,_,_,I)),L),
     unicos(L,S).
-
+    
 % Predicado utentes_por_instituicao:
 %Local do utente, lista das instituições que os utentes desse local já visitaram -> {V,F}
 instituicoes_Local(U,S):-
-    solucoes(I,(utente(ID,_,_,U),cuidado(_,ID,P,_,_),prestador(P,_,_,I)),L),
+    solucoes(I,(utente(ID,_,_,U),cuidado(_,ID,P,_,_,_,_),prestador(P,_,_,I)),L),
     unicos(L,S).
-
+    
 % ------------------------------------------------------
 %  Identificar os cuidados de saúde prestados por instituição/cidade/datas:
 % ------------------------------------------------------
@@ -333,7 +333,7 @@ cuidados_por_instituicao(Instituicao,S) :-
         (Data, Descricao, Custo),
         (
             prestador(IdP,_,_,Instituicao),
-            cuidado(Data,_,IdP,Descricao,Custo)
+            cuidado(Data,_,IdP,Descricao,Custo,_)
         ),
         S
     ).
@@ -345,7 +345,7 @@ cuidados_por_cidade(Cidade,S) :-
         (Data, Descricao,Custo),
         (
             utente(IdU,_,_,Cidade),
-            cuidado(Data,IdU,_,Descricao,Custo)
+            cuidado(Data,IdU,_,Descricao,Custo,_)
         ),
         S
     ).
@@ -355,7 +355,7 @@ cuidados_por_cidade(Cidade,S) :-
 cuidados_por_data(Data,S) :-
     solucoes(
         (Data, Descricao,Custo),
-        (cuidado(Data,_,_,Descricao,Custo)),
+        (cuidado(Data,_,_,Descricao,Custo,_)),
         S).
 
 % ------------------------------------------------------
@@ -367,7 +367,7 @@ cuidados_por_utente_instituicao_prestador(U,I,P,S):-
   solucoes(
     (Data,Descricao,Custo),
     (
-      cuidado(Data,IdU,IdP,Descricao,Custo),
+      cuidado(Data,IdU,IdP,Descricao,Custo,_),
       prestador(IdP,P,_,I),
       utente(IdU,U,_,_)
     ),
@@ -380,7 +380,7 @@ cuidados_por_utente(U,S):-
   solucoes(
     (Data,Descricao,Custo),
     (
-      cuidado(Data,IdU,IdP,Descricao,Custo),
+      cuidado(Data,IdU,IdP,Descricao,Custo,_),
       prestador(IdP,_,_,_),
       utente(IdU,U,_,_)
     ),
@@ -393,7 +393,7 @@ cuidados_por_prestador(P,S):-
   solucoes(
     (Data,Descricao,Custo),
     (
-      cuidado(Data,IdU,IdP,Descricao,Custo),
+      cuidado(Data,IdU,IdP,Descricao,Custo,_),
       prestador(IdP,P,_,_),
       utente(IdU,_,_,_)
     ),
@@ -406,7 +406,7 @@ cuidados_por_prestador(P,S):-
 % Predicado todas_instituicoes_prestadores_por_utente:
 % Id do utente, Lista com os pares (instuição, nome do prestador) que esse utente já visitou
 todas_instituicoes_prestadores_por_utente(U,S):-
-    solucoes((I,NO),(cuidado(_,U,P,_,_),prestador(P,NO,_,I)),L),
+    solucoes((I,NO),(cuidado(_,U,P,_,_,_),prestador(P,NO,_,I)),L),
     unicos(L,S).
 
 % ------------------------------------------------------
@@ -417,7 +417,7 @@ todas_instituicoes_prestadores_por_utente(U,S):-
 custo_por_utente(IdU,C) :-
     solucoes(
         Custo,
-        cuidado(_,IdU,_,_,Custo),
+        cuidado(_,IdU,_,_,Custo,_),
         S),
     soma(S,C).
 
@@ -426,7 +426,7 @@ custo_por_utente(IdU,C) :-
 custo_por_prestador(IdP,C) :-
     solucoes(
         Custo,
-        cuidado(_,_,IdP,_,Custo),
+        cuidado(_,_,IdP,_,Custo,_),
         S),
     soma(S,C).
 
@@ -435,7 +435,7 @@ custo_por_prestador(IdP,C) :-
 custo_por_datas(Data,C) :-
     solucoes(
         Custo,
-        cuidado(Data,_,_,_,Custo),
+        cuidado(Data,_,_,_,Custo,_),
         S),
     soma(S,C).
 
@@ -446,7 +446,7 @@ custo_por_especialidade(Especialidade,C) :-
         Custo,
         (
             prestador(IdP,_,Especialidade,_),
-            cuidado(_,_,IdP,_,Custo)
+            cuidado(_,_,IdP,_,Custo,_)
         ),
         S),
     soma(S,C).
@@ -466,7 +466,7 @@ idade_media_por_prestador(IdP,Idade) :-
         (
             utente(IdU,_,Idade,_),
             prestador(IdP,_,_,_),
-            cuidado(_,IdU,IdP,_,_)
+            cuidado(_,IdU,IdP,_,_,_)
         ),
         S),
     media(S,Idade).
@@ -479,7 +479,7 @@ idade_media_por_instituicao(I,Idade) :-
         (
             utente(IdU,_,Idade,_),
             prestador(IdP,_,_,I),
-            cuidado(_,IdU,IdP,_,_)
+            cuidado(_,IdU,IdP,_,_,_)
         ),
         S),
     media(S,Idade).
@@ -492,7 +492,7 @@ idade_media_por_especialidade(E,Idade) :-
         (
             utente(IdU,_,Idade,_),
             prestador(IdP,_,E,_),
-            cuidado(_,IdU,IdP,_,_)
+            cuidado(_,IdU,IdP,_,_,_)
         ),
         S),
     media(S,Idade).
@@ -507,7 +507,7 @@ utentes_por_descricao(D,S) :-
         (IdU,Nome,Idade,Local),
         (
             utente(IdU,Nome,Idade,Local),
-            cuidado(_,IdU,_,D,_)
+            cuidado(_,IdU,_,D,_,_)
         ),
         S).
 % ------------------------------------------------------
@@ -520,7 +520,7 @@ custo_medio_por_prestador(IdP,Custo) :-
         Custo,
         (
             prestador(IdP,_,_,_),
-            cuidado(_,_,IdP,_,Custo)
+            cuidado(_,_,IdP,_,Custo,_)
         ),
         S),
     media(S,Custo).
@@ -532,7 +532,7 @@ custo_medio_por_instituicao(I,Custo) :-
         Custo,
         (
             prestador(IdP,_,_,I),
-            cuidado(_,_,IdP,_,Custo)
+            cuidado(_,_,IdP,_,Custo,_)
         ),
         S),
     media(S,Custo).
@@ -544,7 +544,19 @@ custo_medio_por_especialidade(E,Custo) :-
         Custo,
         (
             prestador(IdP,_,E,_),
-            cuidado(_,_,IdP,_,Custo)
+            cuidado(_,_,IdP,_,Custo,_)
         ),
         S),
     media(S,Custo).
+
+%Predicado media_prestador:
+%ID do prestador, media do serviço por ele prestado
+
+media_prestador(ID,M):-
+    solucoes(R,(cuidado(_,_,ID,_,_,R)),S),
+    soma(S,T),
+    comprimento(S,C),
+    M is div(T,C).
+
+%Predicado melhor_prestador:
+%ID do melhor prestador
