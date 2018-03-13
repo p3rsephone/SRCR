@@ -9,13 +9,23 @@
 :- dynamic prestador/4.
 :- dynamic cuidado/5.
 
+% -------------------------------------------------------
+% Predicados auxiliares
+
+pertence(H,[H|T]).
+pertence(X,[H|T]) :-
+	X \= H,
+pertence(X,T).
+
+nao(Q) :- Q,!,false.
+nao(Q).
 
 unicos([],[]).
 unicos([H|T], R) :-
-	member(H,T),
+	pertence(H,T),
 	unicos(T,R).
 unicos([H|T], [H|R]) :-
-	not(member(H,T)),
+	nao(pertence(H,T)),
 	unicos(T,R).
 
 
@@ -35,10 +45,10 @@ prestador(2, dr_marisa_silva, medicina_geral, santo_antonio).
 prestador(3, dr_bruno_ferreira, cardiologia, santa_maria).
 prestador(4, dr_fernanda_moreira, cirurgia_geral, cufe).
 
-cuidado(22-03-2008,1,2,constipacao,15).
-cuidado(03-05-2015,2,3,arritmia,45).
-cuidado(17-09-2003,3,1,eczema,30).
-cuidado(30-12-2017,4,4,hernia,150).
+cuidado(2008-03-22,1,2,constipacao,15).
+cuidado(2015-05-03,2,3,arritmia,45).
+cuidado(2003-09-17,3,1,eczema,30).
+cuidado(2017-12-30,4,4,hernia,150).
 % -------------------------------------------------------
 %  Registar utentes, prestadores e cuidados de saúde:
 %
@@ -102,7 +112,6 @@ utentes_pei(P,E,I,S):-
   ),
   unicos(L,S).
 
-
 utentes_p(P,S):-
   solucoes(
     (IdU,Nome,Idade,Morada),
@@ -145,6 +154,7 @@ utentes_i(I,S):-
 % ------------------------------------------------------
 %  Identificar os cuidados de saúde prestados por instituição/cidade/datas:
 %
+
 
 %  Identificar cuidados de saúde realizados por utente/instituição/prestador
 %
@@ -196,5 +206,5 @@ cuidados_saude_p(P,S):-
 %
 
 % ------------------------------------------------------
-%  Calcular o custo total dos cuidados de saúde por utente/especialidade/prestador/datas:
+%  TANIA Calcular o custo total dos cuidados de saúde por utente/especialidade/prestador/datas:
 %
