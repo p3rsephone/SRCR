@@ -4,24 +4,28 @@
 % cuidado : Data, #idUt, #IdPrest, Descrição, Custo --> {V,F}
 % -------------------------------------------------------
 % Definições iniciais
-:- op( 900,xfy,'::').
+:- op(900,xfy,'::').
 :- dynamic utente/4.
 :- dynamic prestador/4.
 :- dynamic cuidado/5.
 
 % -------------------------------------------------------
-% Predicados auxiliares
+% --------------- Predicados auxiliares -----------------
+% -------------------------------------------------------
 
+% Predicado pertence:
 % Elemento, Lista -> {V,F}
 pertence(H,[H|_T]).
 pertence(X,[H|_T]) :-
 	X \= H,
 pertence(X,_T).
 
+% Predicado de negação nao:
 % Predicado -> {V,F}
 nao(_Q) :- _Q,!,false.
 nao(_Q).
 
+% Predicado unico:
 % Lista1, Lista2 -> {V,F}
 unicos([],[]).
 unicos([H|T], R) :-
@@ -31,18 +35,23 @@ unicos([H|T], [H|R]) :-
 	nao(pertence(H,T)),
 	unicos(T,R).
 
+% Predicado comprimento:
 % Lista, Comprimento -> {V,F}
 comprimento([_H],1).
 comprimento([_H|T],N) :- comprimento(T,M), N is M+1.
 
+% Predicado solucoes:
 % Termo, Predicado, Lista -> {V,F}
 solucoes(T,Q,S) :- findall(T,Q,S).
 
+% Predicado soma:
 % Lista, Valor -> {V,F}
 soma([],0).
 soma([N|Ns], T) :- soma(Ns,X), T is X+N.
 % -------------------------------------------------------
-% Factos
+% ---------------------- Factos -------------------------
+% -------------------------------------------------------
+
 utente(1, mario_silva, 18, faro).
 utente(2, raquel_guimaraes, 37, lisboa).
 utente(3, joaquim_canas, 25, braga).
@@ -59,7 +68,7 @@ cuidado(2003-09-17,3,1,eczema,30).
 cuidado(2017-12-30,4,4,hernia,150).
 % -------------------------------------------------------
 %  Registar utentes, prestadores e cuidados de saúde:
-%
+% -------------------------------------------------------
 regista(T) :- solucoes(Inv, +T::Inv, S),
                insercao(T),
                testa(S).
@@ -72,6 +81,7 @@ testa([H|T]) :- H, testa(T).
 %--------------------------------------------------------
 % Invariante Estrutural:  nao permitir a insercao de conhecimento
 %                         repetido
+% -------------------------------------------------------
 +utente(Id,Nome,Idade,Local) :: (solucoes( (Id,Nome,Idade,Local), (utente(Id,Nome,Idade,Local)),S ),
                                  comprimento( S,N ),
 				                 N==1).
@@ -84,8 +94,10 @@ testa([H|T]) :- H, testa(T).
                                                 comprimento( S,N ),
 				                                N==1).
 
-
-% Invariante Referencial : não permitir a inserção de utentes/prestadores com o mesmo ID
+% -------------------------------------------------------
+% Invariante Referencial : não permitir a inserção de utentes/prestadores
+%                          com o mesmo ID
+% -------------------------------------------------------
 +utente(Id,_,_,_) :: (solucoes( (Id,Nome,Idade,Local), (utente(Id,Nome,Idade,Local)),S ),
                                  comprimento( S,N ),
 				                 N==1).
@@ -94,9 +106,10 @@ testa([H|T]) :- H, testa(T).
                                          comprimento( S,N ),
    			                             N==1).
 
-
+% -------------------------------------------------------
 % Invariante Referencial:  não permitir a remoção de utentes/prestadores
 %                          que têm um cuidado associado
+% -------------------------------------------------------
 -utente(IdUt,_,_,_) :: (solucoes( (IdUt),(cuidado(_,IdUt,_,_,_)),S ),
                                   comprimento( S,N ),
 				                  N==0).
@@ -106,7 +119,7 @@ testa([H|T]) :- H, testa(T).
 				                                N==0).
 % ------------------------------------------------------
 %  Remover utentes, prestadores e cuidados de saúde:
-%
+% ------------------------------------------------------
 remove(T) :- solucoes(I,-T::I,S),
               apagar(T),
               testa(S).
@@ -115,45 +128,58 @@ apagar(T) :- retract(T).
 apagar(T) :- assert(T),!,fail.
 % ------------------------------------------------------
 %  Identificar utentes (Critérios de seleção):
-
-identificar_utente_Id(Id,S):-
+% ------------------------------------------------------
+% Predicado identificar_utente_por_Id:
+% Id, Lista de Utentes -> {V,F}
+identificar_utente_por_Id(Id,S):-
   solucoes(
           (Id,Nome,Idade,Local),
           (utente(Id,Nome,Idade,Local)),
           S
           ).
 
-
-identificar_utente_Nome(Nome,S):-
+% Predicado identificar_utente_por_Nome:
+% Nome, Lista de Utentes -> {V,F}
+identificar_utente_por_Nome(Nome,S):-
   solucoes(
           (Id,Nome,Idade,Local),
           (utente(Id,Nome,Idade,Local)),
           S
           ).
 
-identificar_utente_Idade(Idade,S):-
+% Predicado identificar_utente_por_Idade:
+% Idade, Lista de Utentes -> {V,F}
+identificar_utente_por_Idade(Idade,S):-
   solucoes(
           (Id,Nome,Idade,Local),
           (utente(Id,Nome,Idade,Local)),
           S
           ).
 
-identificar_utente_Local(Local,S):-
+% Predicado identificar_utente_por_Local:
+% Local, Lista de Utentes -> {V,F}
+identificar_utente_por_Local(Local,S):-
   solucoes(
           (Id,Nome,Idade,Local),
           (utente(Id,Nome,Idade,Local)),
           S
           ).
 
-identificar_utente_Nome_Idade_Local(Nome,Idade,Local,S):-
+% Predicado identificar_utente_por_Nome_Idade_Local:
+% Nome,Idade,Local,Lista de Utentes -> {V,F}
+identificar_utente_por_Nome_Idade_Local(Nome,Idade,Local,S):-
   solucoes(
           (Id,Nome,Idade,Local),
           (utente(Id,Nome,Idade,Local)),
           S
           ).
+
+% ------------------------------------------------------
 %  Identificar utentes de um prestador/especialidade/instituição:
-%
-utentes_pei(P,E,I,S):-
+% ------------------------------------------------------
+% Predicado utentes_por_prestador_especialidade_instituicao:
+% Prestador, Especialidade, Instituicao, Lista de Utentes -> {V,F}
+utentes_por_prestador_especialidade_instituicao(P,E,I,S):-
   solucoes(
     (IdU,Nome,Idade,Morada),
     (
@@ -165,7 +191,9 @@ utentes_pei(P,E,I,S):-
   ),
   unicos(L,S).
 
-utentes_p(P,S):-
+% Predicado utentes_por_prestador:
+% Prestador, Lista de Utentes -> {V,F}
+utentes_por_prestador(P,S):-
   solucoes(
     (IdU,Nome,Idade,Morada),
     (
@@ -177,7 +205,9 @@ utentes_p(P,S):-
   ),
   unicos(L,S).
 
-utentes_e(E,S):-
+% Predicado utentes_por_especialidade:
+% Especialidade, Lista de Utentes -> {V,F}
+utentes_por_especialidade(E,S):-
   solucoes(
     (IdU,Nome,Idade,Morada),
     (
@@ -189,7 +219,9 @@ utentes_e(E,S):-
   ),
   unicos(L,S).
 
-utentes_i(I,S):-
+% Predicado utentes_por_instituicao:
+% Instituicao, Lista de Utentes -> {V,F}
+utentes_por_instituicao(I,S):-
   solucoes(
     (IdU,Nome,Idade,Morada),
     (
@@ -202,52 +234,61 @@ utentes_i(I,S):-
   unicos(L,S).
 
 % ------------------------------------------------------
-%  Identificar as instituições: -Sérgio
-%
-
-%Lista de todas as instituições no sistema
+%  Identificar as instituições:
+% ------------------------------------------------------
+% Predicado instituicoes:
+%Lista de todas as instituições no sistema -> {V,F}
 instituicoes(S):-
     solucoes(I, prestador(A,B,C,I), L),
     unicos(L,S).
 
-%ID do prestador, lista das instituições desse prestador    
-instituicoes_ID_P(ID, S):-
+% Predicado instituicoes_por_IdPrestador:
+%ID do prestador, lista das instituições desse prestador -> {V,F}
+instituicoes_por_IdPrestador(ID, S):-
     solucoes(I, prestador(ID,B,C,I), L),
     unicos(L,S).
 
-%Nome do prestador, lista das instituições que os prestadores com esse nome já visitaram   
-instituicoes_Nome_P(N, S):-
+% Predicado instituicoes_por_NomePrestador:
+%Nome do prestador, lista das instituições que os prestadores com esse nome já visitaram -> {V,F}
+instituicoes_por_NomePrestador(N, S):-
     solucoes(I, prestador(A,N,C,I), L),
     unicos(L,S).
 
-%Área do prestador, lista das instituições que os utentes dessa área já visitaram 
-instituicoes_Area_P(A, S):-
-    solucoes(I, prestador(B,C,A,I), L),
+% Predicado instituicoes_por_Especialidade:
+%Especialidade do prestador, lista das instituições que os utentes dessa área já visitaram -> {V,F}
+instituicoes_por_Especialidade(E, S):-
+    solucoes(I, prestador(B,C,E,I), L),
     unicos(L,S).
-    
-%ID do utente, lista das instituições que esse utente já visitou
-instituicoes_ID_U(U,S):-
+
+% Predicado utentes_por_IdUtente:
+%ID do utente, lista das instituições que esse utente já visitou -> {V,F}
+instituicoes_por_IdUtente(U,S):-
     solucoes(I,(cuidado(D,U,P,O,M),prestador(P,N,A,I)),L),
     unicos(L,S).
 
-%Nome do utente, lista das instituições já visitadas pelos utentes com esse nome  
-instituicoes_Nome_U(U,S):-
+% Predicado instituicoes_por_NomeUtente:
+%Nome do utente, lista das instituições já visitadas pelos utentes com esse nome -> {V,F}
+instituicoes_por_NomeUtente(U,S):-
     solucoes(I,(utente(ID,U,IDA,LO),cuidado(D,ID,P,O,M),prestador(P,N,A,I)),L),
     unicos(L,S).
 
-%Idade do utente, lista das instituições que os utentes com essa idade já visitaram
-instituicoes_Idade_U(U,S):-
+% Predicado instituicoes_por_Idade:
+%Idade do utente, lista das instituições que os utentes com essa idade já visitaram -> {V,F}
+instituicoes_por_Idade(U,S):-
     solucoes(I,(utente(ID,NO,U,LO),cuidado(D,ID,P,O,M),prestador(P,N,A,I)),L),
     unicos(L,S).
 
-%Local do utente, lista das instituições que os utentes desse local já visitaram
-instituicoes_Local_U(U,S):-
+% Predicado utentes_por_instituicao:
+%Local do utente, lista das instituições que os utentes desse local já visitaram -> {V,F}
+instituicoes_Local(U,S):-
     solucoes(I,(utente(ID,NO,IDA,U),cuidado(D,ID,P,O,M),prestador(P,N,A,I)),L),
     unicos(L,S).
 
 % ------------------------------------------------------
 %  Identificar os cuidados de saúde prestados por instituição/cidade/datas:
-%
+% ------------------------------------------------------
+% Predicado cuidados_por_instituicao:
+% Instituicao,Lista dos cuidados -> {V,F}
 cuidados_por_instituicao(Instituicao,S) :-
     solucoes(
         (Data, Descricao, Custo),
@@ -258,6 +299,8 @@ cuidados_por_instituicao(Instituicao,S) :-
         S
     ).
 
+% Predicado cuidados_por_cidade:
+% Cidade,Lista dos cuidados -> {V,F}
 cuidados_por_cidade(Cidade,S) :-
     solucoes(
         (Data, Descricao,Custo),
@@ -268,15 +311,20 @@ cuidados_por_cidade(Cidade,S) :-
         S
     ).
 
+% Predicado cuidados_por_data:
+% Data,Lista dos cuidados -> {V,F}
 cuidados_por_data(Data,S) :-
     solucoes(
         (Data, Descricao,Custo),
         (cuidado(Data,_,_,Descricao,Custo)),
         S).
 
+% ------------------------------------------------------
 %  Identificar cuidados de saúde realizados por utente/instituição/prestador
-%
-cuidados_saude(U,I,P,S):-
+% ------------------------------------------------------
+% Predicado cuidados_por_utente_instituicao_prestador:
+% Utente,Instituicao,Prestador,Lista dos cuidados -> {V,F}
+cuidados_por_utente_instituicao_prestador(U,I,P,S):-
   solucoes(
     (Data,Descricao,Custo),
     (
@@ -287,7 +335,9 @@ cuidados_saude(U,I,P,S):-
    S
  ).
 
-cuidados_saude_u(U,S):-
+% Predicado cuidados_por_utente:
+% Utente,Lista dos cuidados -> {V,F}
+cuidados_por_utente(U,S):-
   solucoes(
     (Data,Descricao,Custo),
     (
@@ -298,7 +348,9 @@ cuidados_saude_u(U,S):-
    S
  ).
 
-cuidados_saude_i(I,S):-
+% Predicado cuidados_por_instituicao:
+% Instituicao, Lista dos cuidados -> {V,F}
+cuidados_por_instituicao(I,S):-
   solucoes(
     (Data,Descricao,Custo),
     (
@@ -309,7 +361,9 @@ cuidados_saude_i(I,S):-
    S
  ).
 
-cuidados_saude_p(P,S):-
+% Predicado cuidados_por_prestador:
+% Predicado,Lista dos cuidados -> {V,F}
+cuidados_por_prestador(P,S):-
   solucoes(
     (Data,Descricao,Custo),
     (
@@ -319,17 +373,21 @@ cuidados_saude_p(P,S):-
     ),
    S
  ).
+
 % ------------------------------------------------------
-%  Determinar todas as instituições/prestadores a que um utente já recorreu: -Sérgio
-%
-%ID do utente, Lista com os pares (instuição, nome do prestador) que esse utente já visitou
-instituicoes_prestadores(U,S):-
+%  Determinar todas as instituições/prestadores a que um utente já recorreu:
+% ------------------------------------------------------
+% Predicado todas_instituicoes_prestadores_por_utente:
+% Id do utente, Lista com os pares (instuição, nome do prestador) que esse utente já visitou
+todas_instituicoes_prestadores_por_utente(U,S):-
     solucoes((I,NO),(cuidado(D,U,P,O,M),prestador(P,NO,A,I)),L),
     unicos(L,S).
 
 % ------------------------------------------------------
 % Calcular o custo total dos cuidados de saúde por utente/especialidade/prestador/datas:
-%
+% ------------------------------------------------------
+% Predicado custo_por_utente:
+% Id do Utente, Custo total -> {V,F}
 custo_por_utente(IdU,C) :-
     solucoes(
         Custo,
@@ -339,6 +397,8 @@ custo_por_utente(IdU,C) :-
         S),
     soma(S,C).
 
+% Predicado custo_por_prestador:
+%Id do Prestador, Custo total -> {V,F}
 custo_por_prestador(IdP,C) :-
     solucoes(
         Custo,
@@ -348,6 +408,8 @@ custo_por_prestador(IdP,C) :-
         S),
     soma(S,C).
 
+% Predicado custo_por_datas:
+%Data, Custo total -> {V,F}
 custo_por_datas(Data,C) :-
     solucoes(
         Custo,
@@ -357,6 +419,8 @@ custo_por_datas(Data,C) :-
         S),
     soma(S,C).
 
+% Predicado custo_por_especialidade:
+%Especialidade, Custo total -> {V,F}
 custo_por_especialidade(Especialidade,C) :-
     solucoes(
         Custo,
