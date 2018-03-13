@@ -8,8 +8,17 @@
 :- dynamic utente/4.
 :- dynamic prestador/4.
 :- dynamic cuidado/5.
-% -------------------------------------------------------
-% Funções auxiliares
+
+
+unicos([],[]).
+unicos([H|T], R) :-
+	member(H,T),
+	unicos(T,R).
+unicos([H|T], [H|R]) :-
+	not(member(H,T)),
+	unicos(T,R).
+
+
 comprimento([H],1).
 comprimento([H|T],N) :- comprimento(T,M), N is M+1.
 
@@ -78,10 +87,57 @@ apagar(T) :- assert(T),!,fail.
 % ------------------------------------------------------
 %  Identificar utentes (Critérios de seleção): -Sérgio
 %
-
+%
 %  Identificar utentes de um prestador/especialidade/instituição:
 %
+utentes_pei(P,E,I,S):-
+  solucoes(
+    (IdU,Nome,Idade,Morada),
+    (
+      cuidado(_,IdU,IdP,_,_),
+      prestador(IdP,P,E,I),
+      utente(IdU,Nome,Idade,Morada)
+    ),
+   L
+  ),
+  unicos(L,S).
 
+
+utentes_p(P,S):-
+  solucoes(
+    (IdU,Nome,Idade,Morada),
+    (
+      cuidado(_,IdU,IdP,_,_),
+      prestador(IdP,P,_,_),
+      utente(IdU,Nome,Idade,Morada)
+    ),
+   L
+  ),
+  unicos(L,S).
+
+utentes_e(E,S):-
+  solucoes(
+    (IdU,Nome,Idade,Morada),
+    (
+      cuidado(_,IdU,IdP,_,_),
+      prestador(IdP,_,E,_),
+      utente(IdU,Nome,Idade,Morada)
+    ),
+   L
+  ),
+  unicos(L,S).
+
+utentes_i(I,S):-
+  solucoes(
+    (IdU,Nome,Idade,Morada),
+    (
+      cuidado(_,IdU,IdP,_,_),
+      prestador(IdP,_,_,I),
+      utente(IdU,Nome,Idade,Morada)
+    ),
+   L
+  ),
+  unicos(L,S).
 % ------------------------------------------------------
 %  Identificar as instituições: -Sérgio
 %
@@ -100,7 +156,49 @@ instituicoes_todas(ID, S):-
 
 %  Identificar cuidados de saúde realizados por utente/instituição/prestador
 %
+cuidados_saude(U,I,P,S):-
+  solucoes(
+    (Data,Descricao,Custo),
+    (
+      cuidado(Data,IdU,IdP,Descricao,Custo),
+      prestador(IdP,P,_,I),
+      utente(IdU,U,_,_)
+    ),
+   S
+ ).
 
+cuidados_saude_u(U,S):-
+  solucoes(
+    (Data,Descricao,Custo),
+    (
+      cuidado(Data,IdU,IdP,Descricao,Custo),
+      prestador(IdP,_,_,_),
+      utente(IdU,U,_,_)
+    ),
+   S
+ ).
+
+cuidados_saude_i(I,S):-
+  solucoes(
+    (Data,Descricao,Custo),
+    (
+      cuidado(Data,IdU,IdP,Descricao,Custo),
+      prestador(IdP,_,_,I),
+      utente(IdU,_,_,_)
+    ),
+   S
+ ).
+
+cuidados_saude_p(P,S):-
+  solucoes(
+    (Data,Descricao,Custo),
+    (
+      cuidado(Data,IdU,IdP,Descricao,Custo),
+      prestador(IdP,P,_,_),
+      utente(IdU,_,_,_)
+    ),
+   S
+ ).
 % ------------------------------------------------------
 %  Determinar todas as instituições/prestadores a que um utente já recorreu: -Sérgio
 %
