@@ -76,16 +76,24 @@ remove(T) :- solucoes(I,-T::I,S),
 apagar(T) :- retract(T).
 apagar(T) :- assert(T),!,fail.
 % ------------------------------------------------------
-%  Identificar utentes (Critérios de seleção):
+%  Identificar utentes (Critérios de seleção): -Sérgio
 %
 
 %  Identificar utentes de um prestador/especialidade/instituição:
 %
 
 % ------------------------------------------------------
-%  Identificar as instituições:
+%  Identificar as instituições: -Sérgio
 %
+%instituicoes([H|T]):-
+%    prestador(A,B,C,H),
+%    instituicoes(T).
 
+instituicoes_todas(L):-
+    solucoes(I, prestador(A,B,C,I), L).
+
+instituicoes_todas(ID, S):-
+        solucoes(I, prestador(ID,B,C,I), L).
 % ------------------------------------------------------
 %  Identificar os cuidados de saúde prestados por instituição/cidade/datas:
 %
@@ -94,7 +102,7 @@ apagar(T) :- assert(T),!,fail.
 %
 
 % ------------------------------------------------------
-%  Determinar todas as instituições/prestadores a que um utente já recorreu:
+%  Determinar todas as instituições/prestadores a que um utente já recorreu: -Sérgio
 %
 
 % ------------------------------------------------------
