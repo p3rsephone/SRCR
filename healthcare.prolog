@@ -47,16 +47,49 @@ utente(1, mario_silva, 18, faro).
 utente(2, raquel_guimaraes, 37, lisboa).
 utente(3, joaquim_canas, 25, braga).
 utente(4, vania_costa, 67, viseu).
+utente(5, sergio_costa, 21, coimbra).
+utente(6, tania_silva, 52, viana_do_castelo).
+utente(7, alberto_barros, 11, bragança).
+utente(8, jose_resende, 98, beja).
+utente(9, maria_santos, 31, aveiro).
+utente(10, antonio_oliveira, 37, braga).
+utente(11, daniel_marques, 76, lisboa).
+utente(12, francisco_ales, 56, leiria).
+utente(13, paulo_antunes, 34, lisboa).
+utente(14, rita_moreira, 22, braga).
+utente(15, sara_paredes, 25, porto.
+utente(16, pedro_afonso, 67, porto).
 
 prestador(1, dr_joao_lopes, dermatologia, sao_joao).
 prestador(2, dr_marisa_silva, medicina_geral, santo_antonio).
 prestador(3, dr_bruno_ferreira, cardiologia, santa_maria).
 prestador(4, dr_fernanda_moreira, cirurgia_geral, cufe).
+prestador(5, dr_larissa_dias, oftalmologia, trofa_saude).
+prestador(6, dr_paulo_gomes, dermatologia, santo_antonio).
+prestador(7, dr_guilherme_melo, otorrinolaringologia, cufe).
+prestador(8, dr_rafaela_martins, infectologia, sao_joao).
+prestador(9, dr_igor_pereira, cardiologia, sao_maria).
+prestador(10, dr_marina_almeida, ginecologia, santo_antonio).
+prestador(11, dr_andré_carvalho, oftalmologia, santa_joao).
+prestador(12, dr_yasmin_barbosa, cirurgia_geral, cufe).
 
 cuidado(2008-03-22,1,2,constipacao,15).
 cuidado(2015-05-03,2,3,arritmia,45).
 cuidado(2003-09-17,3,1,eczema,30).
 cuidado(2017-12-30,4,4,hernia,150).
+cuidado(2008-03-22,5,5,catarata,15).
+cuidado(2015-05-03,6,10,menopausa,45).
+cuidado(2003-09-17,7,7,otite,30).
+cuidado(2017-12-30,8,6,pele_irritada,150).
+cuidado(2008-03-22,9,8,fungos,15).
+cuidado(2015-05-03,10,2,constipacao,45).
+cuidado(2003-09-17,11,12,quisto,30).
+cuidado(2017-12-30,12,11,catarata,150).
+cuidado(2008-03-22,13,9,sopro_no_coracao,15).
+cuidado(2015-05-03,14,1,eczema,45).
+cuidado(2003-09-17,15,2,constipacao,30).
+cuidado(2017-12-30,16,3,arritmia,150).
+
 % -------------------------------------------------------
 %  Registar utentes, prestadores e cuidados de saúde:
 %
