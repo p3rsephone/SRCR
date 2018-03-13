@@ -181,9 +181,50 @@ utentes_i(I,S):-
    L
   ),
   unicos(L,S).
+
 % ------------------------------------------------------
-%  Identificar as instituições:
+%  Identificar as instituições: -Sérgio
 %
+
+%Lista de todas as instituições no sistema
+instituicoes(S):-
+    solucoes(I, prestador(A,B,C,I), L),
+    unicos(L,S).
+
+%ID do prestador, lista das instituições desse prestador    
+instituicoes_ID_P(ID, S):-
+    solucoes(I, prestador(ID,B,C,I), L),
+    unicos(L,S).
+
+%Nome do prestador, lista das instituições que os prestadores com esse nome já visitaram   
+instituicoes_Nome_P(N, S):-
+    solucoes(I, prestador(A,N,C,I), L),
+    unicos(L,S).
+
+%Área do prestador, lista das instituições que os utentes dessa área já visitaram 
+instituicoes_Area_P(A, S):-
+    solucoes(I, prestador(B,C,A,I), L),
+    unicos(L,S).
+    
+%ID do utente, lista das instituições que esse utente já visitou
+instituicoes_ID_U(U,S):-
+    solucoes(I,(cuidado(D,U,P,O,M),prestador(P,N,A,I)),L),
+    unicos(L,S).
+
+%Nome do utente, lista das instituições já visitadas pelos utentes com esse nome  
+instituicoes_Nome_U(U,S):-
+    solucoes(I,(utente(ID,U,IDA,LO),cuidado(D,ID,P,O,M),prestador(P,N,A,I)),L),
+    unicos(L,S).
+
+%Idade do utente, lista das instituições que os utentes com essa idade já visitaram
+instituicoes_Idade_U(U,S):-
+    solucoes(I,(utente(ID,NO,U,LO),cuidado(D,ID,P,O,M),prestador(P,N,A,I)),L),
+    unicos(L,S).
+
+%Local do utente, lista das instituições que os utentes desse local já visitaram
+instituicoes_Local_U(U,S):-
+    solucoes(I,(utente(ID,NO,IDA,U),cuidado(D,ID,P,O,M),prestador(P,N,A,I)),L),
+    unicos(L,S).
 
 % ------------------------------------------------------
 %  Identificar os cuidados de saúde prestados por instituição/cidade/datas:
@@ -236,8 +277,12 @@ cuidados_saude_p(P,S):-
    S
  ).
 % ------------------------------------------------------
-%  Determinar todas as instituições/prestadores a que um utente já recorreu:
+%  Determinar todas as instituições/prestadores a que um utente já recorreu: -Sérgio
 %
+%ID do utente, Lista com os pares (instuição, nome do prestador) que esse utente já visitou
+instituicoes_prestadores(U,S):-
+    solucoes((I,NO),(cuidado(D,U,P,O,M),prestador(P,NO,A,I)),L),
+    unicos(L,S).
 
 % ------------------------------------------------------
 %  TANIA Calcular o custo total dos cuidados de saúde por utente/especialidade/prestador/datas:
