@@ -49,11 +49,51 @@ solucoes(T,Q,S) :- findall(T,Q,S).
 soma([],0).
 soma([N|Ns], T) :- soma(Ns,X), T is X+N.
 
+% Predicado media:
+% Lista, Valor -> {V,F}
 media([],0).
 media(List,Med) :-
     soma(List,X),
     comprimento(List,L),
     Med is (div(X,L)).
+
+% Predicado isEqual
+% Vê se dois elementos sao iguais
+isEqual(A,A).
+
+% Predicado isNotEqual
+% Vê se dois elementos nao sao iguais
+isNotEqual(A,B):- A\=B.
+
+%Predicado contar_occ:
+%elemento, lista, quantas vezes aparece o elemento na lista
+contar_occ(E, L, N) :-
+        adicionar(E, L, L2), comprimento(L2, N).
+
+%Predicado adicionar
+%elemento, lista, lista com apenas os "elemento"
+adicionar(_E,[],[]).
+
+adicionar(E,[H|T],[H|L1]):-
+    adicionar(E,T,L1),
+    isEqual(E,H).
+
+adicionar(E,[H|T],L1):-
+        adicionar(E,T,L1),
+        isNotEqual(E,H).
+
+%Predicado maior_dupl
+%lista com duplos, algum elemento, as vezes que aparece nos cuidados
+maior_dupl([],0,0).
+
+maior_dupl([(P,N)|T],P,N):-
+    maior_dupl(T,_,C),
+    N >= C.
+
+maior_dupl([(_,N)|T],R,C):-
+        maior_dupl(T,R,C),
+        C > N.
+
 % -------------------------------------------------------
 % ---------------------- Factos -------------------------
 % -------------------------------------------------------
@@ -280,49 +320,49 @@ utentes_por_instituicao(I,S):-
 instituicoes(S):-
     solucoes(I, prestador(_,_,_,I), L),
     unicos(L,S).
-    
+
 % Predicado instituicoes_por_IdPrestador:
 %ID do prestador, lista das instituições desse prestador -> {V,F}
 instituicoes_por_IdPrestador(ID, S):-
     solucoes(I, prestador(ID,_,_,I), L),
     unicos(L,S).
-    
+
 % Predicado instituicoes_por_NomePrestador:
 %Nome do prestador, lista das instituições que os prestadores com esse nome já visitaram -> {V,F}
 instituicoes_por_NomePrestador(N, S):-
     solucoes(I, prestador(_,N,_,I), L),
     unicos(L,S).
-    
+
 % Predicado instituicoes_por_Especialidade:
 %Especialidade do prestador, lista das instituições que os utentes dessa área já visitaram -> {V,F}
 instituicoes_por_Especialidade(E, S):-
     solucoes(I, prestador(_,_,E,I), L),
     unicos(L,S).
-    
+
 % Predicado utentes_por_IdUtente:
 %ID do utente, lista das instituições que esse utente já visitou -> {V,F}
 instituicoes_por_IdUtente(U,S):-
     solucoes(I,(cuidado(_,U,P,_,_,_,_),prestador(P,_,_,I)),L),
     unicos(L,S).
-    
+
 % Predicado instituicoes_por_NomeUtente:
 %Nome do utente, lista das instituições já visitadas pelos utentes com esse nome -> {V,F}
 instituicoes_por_NomeUtente(U,S):-
     solucoes(I,(utente(ID,U,_,_),cuidado(_,ID,P,_,_,_,_),prestador(P,_,_,I)),L),
     unicos(L,S).
-    
+
 % Predicado instituicoes_por_Idade:
 %Idade do utente, lista das instituições que os utentes com essa idade já visitaram -> {V,F}
 instituicoes_por_Idade(U,S):-
     solucoes(I,(utente(ID,_,U,_),cuidado(_,ID,P,_,_,_,_),prestador(P,_,_,I)),L),
     unicos(L,S).
-    
+
 % Predicado utentes_por_instituicao:
 %Local do utente, lista das instituições que os utentes desse local já visitaram -> {V,F}
 instituicoes_Local(U,S):-
     solucoes(I,(utente(ID,_,_,U),cuidado(_,ID,P,_,_,_,_),prestador(P,_,_,I)),L),
     unicos(L,S).
-    
+
 % ------------------------------------------------------
 %  Identificar os cuidados de saúde prestados por instituição/cidade/datas:
 % ------------------------------------------------------
@@ -460,7 +500,7 @@ custo_por_especialidade(Especialidade,C) :-
 % ------------------------------------------------------
 % Predicado idade_media_por_prestador:
 % Id do Utente, Idade média -> {V,F}
-idade_media_por_prestador(IdP,Idade) :-
+idade_media_por_prestador(IdP,IdadeMedia) :-
     solucoes(
         Idade,
         (
@@ -469,11 +509,11 @@ idade_media_por_prestador(IdP,Idade) :-
             cuidado(_,IdU,IdP,_,_,_)
         ),
         S),
-    media(S,Idade).
+    media(S,IdadeMedia).
 
 % Predicado idade_media_por_instituicao:
 % Instituicao, Idade média -> {V,F}
-idade_media_por_instituicao(I,Idade) :-
+idade_media_por_instituicao(I,IdadeMedia) :-
     solucoes(
         Idade,
         (
@@ -482,11 +522,11 @@ idade_media_por_instituicao(I,Idade) :-
             cuidado(_,IdU,IdP,_,_,_)
         ),
         S),
-    media(S,Idade).
+    media(S,IdadeMedia).
 
 % Predicado idade_media_por_especialidade:
 % Especialidade, Idade média -> {V,F}
-idade_media_por_especialidade(E,Idade) :-
+idade_media_por_especialidade(E,IdadeMedia) :-
     solucoes(
         Idade,
         (
@@ -495,7 +535,7 @@ idade_media_por_especialidade(E,Idade) :-
             cuidado(_,IdU,IdP,_,_,_)
         ),
         S),
-    media(S,Idade).
+    media(S,IdadeMedia).
 
 % ------------------------------------------------------
 % Determinar todos os utentes com a mesma descricao:
@@ -515,7 +555,7 @@ utentes_por_descricao(D,S) :-
 % ------------------------------------------------------
 % Predicado custo_medio_por_prestador:
 % Id do Prestador, Custo médio -> {V,F}
-custo_medio_por_prestador(IdP,Custo) :-
+custo_medio_por_prestador(IdP,CustoMedio) :-
     solucoes(
         Custo,
         (
@@ -523,11 +563,11 @@ custo_medio_por_prestador(IdP,Custo) :-
             cuidado(_,_,IdP,_,Custo,_)
         ),
         S),
-    media(S,Custo).
+    media(S,CustoMedio).
 
 % Predicado custo_medio_por_instituicao:
 % Instituicao, Custo médio -> {V,F}
-custo_medio_por_instituicao(I,Custo) :-
+custo_medio_por_instituicao(I,CustoMedio) :-
     solucoes(
         Custo,
         (
@@ -535,11 +575,11 @@ custo_medio_por_instituicao(I,Custo) :-
             cuidado(_,_,IdP,_,Custo,_)
         ),
         S),
-    media(S,Custo).
+    media(S,CustoMedio).
 
 % Predicado custo_medio_por_especialidade:
 % Especialidade, Custo médio -> {V,F}
-custo_medio_por_especialidade(E,Custo) :-
+custo_medio_por_especialidade(E,CustoMedio) :-
     solucoes(
         Custo,
         (
@@ -547,17 +587,21 @@ custo_medio_por_especialidade(E,Custo) :-
             cuidado(_,_,IdP,_,Custo,_)
         ),
         S),
-    media(S,Custo).
+    media(S,CustoMedio).
 
+% ------------------------------------------------------
+% Verificar o serviço mais prestado por um prestador:
+% ------------------------------------------------------
 %Predicado media_prestador:
 %ID do prestador, media do serviço por ele prestado
 
 media_prestador(ID,M):-
     solucoes(R,(cuidado(_,_,ID,_,_,R)),S),
-    soma(S,T),
-    comprimento(S,C),
-    M is div(T,C).
+    media(S,M).
 
+% ------------------------------------------------------
+% Verificar o melhor prestador/instituicao e a quantidade de vezes que prestou servicos:
+% ------------------------------------------------------
 %Predicado melhor_prestador:
 %ID do melhor prestador, quantidade de vezes que ele prestou serviços
 
@@ -566,41 +610,6 @@ melhor_prestador(ID,Q):-
         solucoes((Pr,N),(prestador(Pr,_,_,_),contar_occ(Pr,L,N)),S),
         maior_dupl(S,ID,Q).
 
-%Predicado maior_dupl
-%lista com duplos, algum elemento, as vezes que aparece nos cuidados
-maior_dupl([],0,0).
-
-maior_dupl([(P,N)|T],P,N):-
-    maior_dupl(T,R,C),
-    N >= C.
-
-maior_dupl([(P,N)|T],R,C):-
-        maior_dupl(T,R,C),
-        C > N.
-
-%isEqual -> vê se dois elementos sao iguais
-isEqual(A,A).
-
-%isNotEqual -> vê se dois elementos nao sao iguais
-isNotEqual(A,B):- A\=B.
-
-%Predicado contar_occ:
-%elemento, lista, quantas vezes aparece o elemento na lista
-contar_occ(E, L, N) :-
-        adicionar(E, L, L2), comprimento(L2, N).
-
-%Predicado adicionar
-%elemento, lista, lista com apenas os "elemento"
-adicionar(E,[],[]).
-
-adicionar(E,[H|T],[H|L1]):-
-    adicionar(E,T,L1),
-    isEqual(E,H).
-
-adicionar(E,[H|T],L1):-
-        adicionar(E,T,L1),
-        isNotEqual(E,H).
-
 %Predicado melhor_instuicao
 %instituicao com mais cuidados, quantidade de cuidados
 melhor_instituicao(I,Q):-
@@ -608,4 +617,3 @@ melhor_instituicao(I,Q):-
     solucoes((INS,N),(prestador(_,_,_,INS),contar_occ(INS,L,N)),S),
     unicos(S,Novo),
     maior_dupl(Novo,I,Q).
-
