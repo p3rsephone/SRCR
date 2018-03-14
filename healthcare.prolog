@@ -608,3 +608,4 @@ melhor_instituicao(I,Q):-
     solucoes((INS,N),(prestador(_,_,_,INS),contar_occ(INS,L,N)),S),
     unicos(S,Novo),
     maior_dupl(Novo,I,Q).
+
