@@ -366,6 +366,19 @@ instituicoes_Local(U,S):-
 % ------------------------------------------------------
 %  Identificar os cuidados de saúde prestados por instituição/cidade/datas:
 % ------------------------------------------------------
+% Predicado cuidados_por_instituicao_cidade_data:
+% Instituicao,Cidade,Data,Lista dos cuidados -> {V,F}
+cuidados_por_instituicao_cidade_data(I,L,D,S):-
+  solucoes(
+    (D,Descricao,Custo),
+    (
+      cuidado(D,IdU,IdP,Descricao,Custo,_),
+      prestador(IdP,_,_,I),
+      utente(IdU,_,_,L)
+    ),
+   S
+ ).
+
 % Predicado cuidados_por_instituicao:
 % Instituicao,Lista dos cuidados -> {V,F}
 cuidados_por_instituicao(Instituicao,S) :-
@@ -452,6 +465,19 @@ todas_instituicoes_prestadores_por_utente(U,S):-
 % ------------------------------------------------------
 % Calcular o custo total dos cuidados de saúde por utente/especialidade/prestador/datas:
 % ------------------------------------------------------
+% Predicado custo_por_utente_especialidade_prestador_data:
+% Utente,Especialidade,Prestador,Data,Lista dos cuidados -> {V,F}
+custo_por_utente_especialidade_prestador_data(IdU,E,IdP,D,S):-
+  solucoes(
+    (D,Descricao,Custo),
+    (
+      cuidado(D,IdU,IdP,Descricao,Custo,_),
+      prestador(IdP,_,E,_),
+      utente(IdU,_,_,_)
+    ),
+   S
+ ).
+
 % Predicado custo_por_utente:
 % Id do Utente, Custo total -> {V,F}
 custo_por_utente(IdU,C) :-
