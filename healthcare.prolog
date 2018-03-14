@@ -559,4 +559,52 @@ media_prestador(ID,M):-
     M is div(T,C).
 
 %Predicado melhor_prestador:
-%ID do melhor prestador
+%ID do melhor prestador, quantidade de vezes que ele prestou serviços
+
+melhor_prestador(ID,Q):-
+        solucoes(P,cuidado(_,_,P,_,_,_),L),
+        solucoes((Pr,N),(prestador(Pr,_,_,_),contar_occ(Pr,L,N)),S),
+        maior_dupl(S,ID,Q).
+
+%Predicado maior_dupl
+%lista com duplos, algum elemento, as vezes que aparece nos cuidados
+maior_dupl([],0,0).
+
+maior_dupl([(P,N)|T],P,N):-
+    maior_dupl(T,R,C),
+    N >= C.
+
+maior_dupl([(P,N)|T],R,C):-
+        maior_dupl(T,R,C),
+        C > N.
+
+%isEqual -> vê se dois elementos sao iguais
+isEqual(A,A).
+
+%isNotEqual -> vê se dois elementos nao sao iguais
+isNotEqual(A,B):- A\=B.
+
+%Predicado contar_occ:
+%elemento, lista, quantas vezes aparece o elemento na lista
+contar_occ(E, L, N) :-
+        adicionar(E, L, L2), comprimento(L2, N).
+
+%Predicado adicionar
+%elemento, lista, lista com apenas os "elemento"
+adicionar(E,[],[]).
+
+adicionar(E,[H|T],[H|L1]):-
+    adicionar(E,T,L1),
+    isEqual(E,H).
+
+adicionar(E,[H|T],L1):-
+        adicionar(E,T,L1),
+        isNotEqual(E,H).
+
+%Predicado melhor_instuicao
+%instituicao com mais cuidados, quantidade de cuidados
+melhor_instituicao(I,Q):-
+    solucoes(IN,(cuidado(_,_,P,_,_,_), prestador(P,_,_,IN)),L),
+    solucoes((INS,N),(prestador(_,_,_,INS),contar_occ(INS,L,N)),S),
+    unicos(S,Novo),
+    maior_dupl(Novo,I,Q).
