@@ -125,7 +125,12 @@ utente(13, paulo_antunes, 34, lisboa).
 utente(14, rita_moreira, 22, braga).
 utente(15, sara_paredes, 25, porto).
 utente(16, pedro_afonso, 67, porto).
+% -------------------------------------------------------
+% -------------- Conhecimento Imperfeito ----------------
+% ---------------------- Utente -------------------------
 utente(noID, marta_silva, 39, faro).
+%TODO: Add more
+
 
 prestador(1, dr_joao_lopes, dermatologia, sao_joao).
 prestador(2, dr_marisa_silva, medicina_geral, santo_antonio).
@@ -139,6 +144,10 @@ prestador(9, dr_igor_pereira, cardiologia, santa_maria).
 prestador(10, dr_marina_almeida, ginecologia, santo_antonio).
 prestador(11, dr_andre_carvalho, oftalmologia, sao_joao).
 prestador(12, dr_yasmin_barbosa, cirurgia_geral, cufe).
+% -------------------------------------------------------
+% -------------- Conhecimento Imperfeito ----------------
+% --------------------- Prestador -----------------------
+
 
 cuidado(2008-03-22,1,2,constipacao,15,60).
 cuidado(2015-05-03,2,3,arritmia,45,80).
@@ -156,6 +165,9 @@ cuidado(2008-03-22,13,9,sopro_no_coracao,15,81).
 cuidado(2015-05-03,14,1,eczema,45,100).
 cuidado(2003-09-17,15,2,constipacao,30,70).
 cuidado(2017-12-30,16,3,arritmia,150,65).
+% -------------------------------------------------------
+% -------------- Conhecimento Imperfeito ----------------
+% --------------------- Cuidado -------------------------
 
 % -------------------------------------------------------
 %  Registar utentes, prestadores e cuidados de saúde:
