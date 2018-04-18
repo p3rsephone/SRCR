@@ -147,7 +147,12 @@ prestador(12, dr_yasmin_barbosa, cirurgia_geral, cufe).
 % -------------------------------------------------------
 % -------------- Conhecimento Imperfeito ----------------
 % --------------------- Prestador -----------------------
+prestador(noID, dr_carlos_faria, ginecologia, cufe).
+prestador(55, dr_maria_neves, noEspecialidade, trofa_saude).
+prestador(yyyy, dr_tiago_maltes, dermatologia, santa_maria).
+prestador(54, dr_ivo_moreira,medicina_geral, yyyy).
 
+%TODO: Add more
 
 cuidado(2008-03-22,1,2,constipacao,15,60).
 cuidado(2015-05-03,2,3,arritmia,45,80).
@@ -684,6 +689,11 @@ excecao(utente(Id,_,Idade,Local)):- utente(Id,john_doe,Idade,Local).
 excecao(utente(Id,Nome,_,Local)):- utente(Id,Nome,xxxx,Local).
 excecao(utente(Id,Nome,Idade,_)):- utente(Id,Nome,Idade,xxxx).
 
+excecao(prestador(_,Nome,Especialidade,Local)) :- prestador(yyyy,Nome,Especialidade,Local).
+excecao(prestador(Id,_,Especialidade,Local)) :- prestador(Id,yyyy,Especialidade,Local).
+excecao(prestador(Id,Nome,_,Local)) :- prestador(Id,Nome,yyyy,Local).
+excecao(prestador(Id,Nome,Especialidade,_)) :- prestador(Id,Nome,Especialidade,yyyy).
+
 %TODO: Fazer para os outros. O xxxx e john_doe foram nomes que escolhi para representar quando não sabemos quem foi (mas podemos vir a saber)
 
 % ------------------------------------------------------
@@ -692,6 +702,14 @@ excecao(utente(Id,Nome,Idade,_)):- utente(Id,Nome,Idade,xxxx).
 % Há um utente de id 100 com 22 anos da guarda que ou se chama maria ou joana
 excecao(utente(100,maria,22,guarda)).
 excecao(utente(100,joana,22,guarda)).
+
+excecao(prestador(50,dr_paula_barros,cardiologia,sao_joao)).
+excecao(prestador(50,dr_paula_barros,infectologia,sao_joao)).
+excecao(prestador(51,dr_antonio_torres,oftalmologia,cufe)).
+excecao(prestador(51,dr_manuel_vieira,oftalmologia,cufe)).
+excecao(prestador(52,dr_claudia_carvalho,cirurgia_geral,cufe)).
+excecao(prestador(53,dr_claudia_carvalho,cidade,cufe)).
+
 %TODO: Fazer para os outros.
 
 % ------------------------------------------------------
@@ -703,6 +721,11 @@ excecao(utente(Id,_,Idade,Local):- utente(Id,noName,Idade,Local)).
 excecao(utente(Id,Nome,_,Local)):- utente(Id,Nome,noIdade,Local).
 excecao(utente(Id,Nome,Idade,_)):- utente(Id,Nome,Idade,noLocal).
 
+excecao(prestador(_,Nome,Especialidade,Local):- prestador(noId,Nome,Especialidade,Local)).
+excecao(prestador(Id,_,Especialidade,Local):- prestador(Id,noName,Especialidade,Local)).
+excecao(prestador(Id,Nome,_,Local)):- prestador(Id,Nome,noEspecialidade,Local).
+excecao(prestador(Id,Nome,Especialidade,_)):- prestador(Id,Nome,Especialidade,noLocal).
+
 nulo(noId).
 nulo(noName).
 nulo(noIdade).
@@ -712,6 +735,14 @@ nulo(noDescricao).
 nulo(noCusto).
 nulo(noRating).
 nulo(noData).
+
++prestador(Id,Name,Especialidade, Local) :- solucoes(Id,(prestador(Id, dr_carlos_faria,ginecologia,cufe), nao(nulo(Id))), L),
+                                            comprimento(L, N),
+                                            N==0.
+
++prestador(Id,Name,Especialidade, Local) :- solucoes(Especialidade,(prestador(55, dr_maria_neves,Especialidade,trofa_saude), nao(nulo(Especialidade))), L),
+                                            comprimento(L, N),
+                                            N==0.
 
 :- utente(Id, marta_silva, 39, faro), nao(nulo(Id)).
 %TODO: Fazer para os outros.
