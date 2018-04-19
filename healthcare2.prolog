@@ -4,8 +4,15 @@
 % cuidado : Data, #idUt, #IdPrest, Descrição, Custo --> {V,F}
 % -------------------------------------------------------
 % Definições iniciais
+
+:- op(900, xfy, '::').
+:- op(996, xfy, '&&' ).  % operador de conjuncao
+:- op(997, xfy, '$$' ).  % operador de disjuncao
+:- op(998, xfx, '=>' ).  % operador de implicacao
+:- op(999, xfx, '<=>' ). % operador de equivalencia
+
+
 :- dynamic '-'/1.
-:- op(900,xfy,'::').
 :- dynamic utente/4.
 :- dynamic prestador/4.
 :- dynamic cuidado/6.
@@ -13,6 +20,36 @@
 % -------------------------------------------------------
 % --------------- Predicados auxiliares -----------------
 % -------------------------------------------------------
+
+% Extensao do meta-predicado demo :: Expressão, Resposta -> {V,F}
+demo( P <=> X, V ) :- demo( P, V1 ), demo( X, V2 ), equivalencia( V1, V2, V ), !.
+demo( P => X, V ) :- demo( P, V1 ), demo( X, V2 ), implicacao( V1, V2, V ), !.
+demo( P $$ X, V ) :- demo( P, V1 ), demo( X, V2 ), disjuncao( V1, V2, V ), !.
+demo( P && X, V ) :- demo( P, V1 ), demo( X, V2 ), conjuncao( V1, V2, V ), !.
+
+equivalencia( X, X, verdadeiro ) :- X \= desconhecido.
+equivalencia( desconhecido, Y, desconhecido ).
+equivalencia( X, desconhecido, desconhecido ).
+equivalencia( verdadeiro, falso, falso ).
+equivalencia( falso, verdadeiro, falso ).
+
+implicacao( falso, X, verdadeiro ).
+implicacao( X, verdadeiro, verdadeiro ).
+implicacao( verdadeiro, desconhecido, desconhecido ).
+implicacao( desconhecido, X, desconhecido ) :- X \= verdadeiro.
+implicacao( verdadeiro, falso, falso ).
+
+disjuncao( verdadeiro, X, verdadeiro ).
+disjuncao( X, verdadeiro, verdadeiro ).
+disjuncao( desconhecido, Y, desconhecido ) :- Y \= verdadeiro.
+disjuncao( Y, desconhecido, desconhecido ) :- Y \= verdadeiro.
+disjuncao( falso, falso, falso ).
+
+conjuncao( verdadeiro, verdadeiro, verdadeiro ).
+conjuncao( falso, _, falso ).
+conjuncao( _, falso, falso ).
+conjuncao( desconhecido, verdadeiro, desconhecido ).
+conjuncao( verdadeiro, desconhecido, desconhecido ).
 
 % Predicado demo:
 % Questao, Resposta -> {V,F}
@@ -173,7 +210,19 @@ cuidado(2017-12-30,16,3,arritmia,150,65).
 % -------------------------------------------------------
 % -------------- Conhecimento Imperfeito ----------------
 % --------------------- Cuidado -------------------------
+cuidado(noData,13,9,sopro_no_coracao,15,81).
 
+cuidado(2016-06-04,14,1,eczema,45,100).
+
+cuidado(2003-09-17,15,2,constipacao,noCusto,70).
+
+cuidado(2017-12-30,16,3,osso_partido,150,65).
+
+cuidado(2008-03-22,noIdPrest,5,catarata,15,30).
+cuidado(2015-05-03,6,10,menopausa,45,42).
+cuidado(2003-09-17,7,7,otite,30,noRating).
+
+cuidado(2017-12-30,9,6,pele_irritada,150,70).
 % -------------------------------------------------------
 %  Registar utentes, prestadores e cuidados de saúde:
 % -------------------------------------------------------
@@ -744,5 +793,5 @@ nulo(noData).
                                             comprimento(L, N),
                                             N==0.
 
-:- utente(Id, marta_silva, 39, faro), nao(nulo(Id)).
+%:- utente(Id, marta_silva, 39, faro), nao(nulo(Id)).
 %TODO: Fazer para os outros.
