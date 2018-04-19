@@ -31,7 +31,7 @@ equivalencia( X, X, verdadeiro ) :- X \= desconhecido.
 equivalencia( desconhecido, Y, desconhecido ).
 equivalencia( X, desconhecido, desconhecido ).
 equivalencia( verdadeiro, falso, falso ).
-equivalencia( verdadeiro, falso, falso ).
+equivalencia( falso, verdadeiro, falso ).
 
 implicacao( falso, X, verdadeiro ).
 implicacao( X, verdadeiro, verdadeiro ).
