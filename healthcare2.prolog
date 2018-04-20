@@ -17,6 +17,8 @@
 :- dynamic imp/1.  % operador de impreciso
 :- dynamic '-'/1.
 :- dynamic excecao/1.
+:- dynamic positivo/2.
+:- dynamic negativo/2.
 
 
 % -------------------------------------------------------
@@ -224,7 +226,7 @@ evolucao( prestador(Id, Nome, E,Ins), positivo) :-
     testa(Li),
     apagarPrestador(Id),
     apagarIncerto(Id,p),
-    apagarPrestadorNegativo(Id,p),
+    apagarPrestadorNegativo(Id),
     apagarNegativoP(Id,p),
     subsImpreciso(Id,p).
 
