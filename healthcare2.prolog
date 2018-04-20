@@ -143,12 +143,50 @@ apagarIncerto(Id,p) :-
         apagar(incerto(Id,p)).
 apagarIncerto(Id,p).
 
+% Predicado apagarNegativoC
+% Vê se existe um predicado negativo com aquele ID e se existir apaga-o
+apagarNegativoC(Id,c) :-
+        negativo(Id,c),
+        apagar(negativo(Id,c)).
+apagarNegativoC(Id,c).
+
+% Predicado apagarNegativoU
+% Vê se existe um predicado negativo com aquele ID e se existir apaga-o
+apagarNegativoU(Id,u) :-
+        negativo(Id,u),
+        apagar(negativo(Id,u)).
+apagarNegativoU(Id,u).
+
+% Predicado apagarNegativoP
+% Vê se existe um predicado negativo com aquele ID e se existir apaga-o
+apagarNegativoP(Id,p) :-
+        negativo(Id,p),
+        apagar(negativo(Id,p)).
+apagarNegativoP(Id,p).
+
 % Predicado apagarPrestador
 % Vê se existe um predicado incerto com aquele ID e se existir apaga o prestador correspondente
 apagarPrestador(Id) :-
         incerto(Id,p),
         apagar(prestador(Id,_,_,_)).
 
+% Predicado apagarPrestadorNegativo
+% Vê se existe um predicado negativo com aquele ID e se existir apaga o prestador correspondente
+apagarPrestadorNegativo(Id) :-
+        negativo(Id,p),
+        apagar(prestador(Id,_,_,_)).
+      %
+% Predicado apagarUtenteNegativo
+% Vê se existe um predicado negativo com aquele ID e se existir apaga o utente correspondente
+apagarUtenteNegativo(Id) :-
+        negativo(Id,u),
+        apagar(utente(Id,_,_,_)).
+
+% Predicado apagarCuidadoNegativo
+% Vê se existe um predicado negativo com aquele ID e se existir apaga o cuidado correspondente
+apagarCuidadoNegativo(Id) :-
+        negativo(Id,c),
+        apagar(cuidado(Id,_,_,_,_,_,_)).
 % -------------------------------------------------------
 %  Evoluções prestador:
 % -------------------------------------------------------
@@ -161,12 +199,15 @@ evolucao( prestador(Id, Nome, E,Ins), positivo) :-
     testa(Li),
     apagarPrestador(Id),
     apagarIncerto(Id,p),
+    apagarPrestadorNegativo(Id,p),
+    apagarNegativoP(Id,p),
     subsImpreciso(Id,p).
 
 evolucao( prestador(Id,Nome,Especialidade,Local) , negativo ) :-
     solucoes( I, +(-prestador(Id,Nome,Especialidade,Local) )::I, Li ),
     insercao(-prestador(Id,Nome,Especialidade,Local) ),
     testa(Li),
+    apagar((incerto(Id, p) :- (apagar((excecao(prestador(Id,Nome,Especialidade,Local))  :- incerto(Id,p)))))),
     insercao(negativo(Id,p)).
 
 evolucao( [prestador(Id,Nome,Especialidade,Local) | R], impreciso ) :-
@@ -224,12 +265,15 @@ evolucao( utente(Id, Nome, Idade ,Local), positivo) :-
     insercao(positivo(Id,u)),
     testa(Li),
     apagar((incerto(Id, u) :- (apagar((excecao(utente(Id, Nome, Idade ,Local))  :- incerto(Id,u)))))),
+    apagarUtenteNegativo(Id,u),
+    apagarNegativoU(Id,u),
     subsImpreciso(Id,u).
 
 evolucao( utente(Id, Nome, Idade ,Local) , negativo ) :-
     solucoes( I, +(-utente(Id, Nome, Idade ,Local) )::I, Li ),
     insercao(-utente(Id, Nome, Idade ,Local) ),
     testa(Li),
+    apagar((incerto(Id, u) :- (apagar((excecao(utente(Id, Nome, Idade ,Local))  :- incerto(Id,u)))))),
     insercao(negativo(Id,u)).
 
 evolucao( [utente(Id, Nome, Idade ,Local) | R], impreciso ) :-
@@ -288,12 +332,15 @@ evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), positivo) :-
     insercao(positivo(Id,c)),
     testa(Li),
     apagar((incerto(Id, c) :- (apagar((excecao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))  :- incerto(Id,c)))))),
+    apagarCuidadoNegativo(Id,c),
+    apagarNegativoC(Id,c),
     subsImpreciso(Id,c).
 
 evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) , negativo ) :-
     solucoes( I, +(-cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) )::I, Li ),
     insercao(-cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) ),
     testa(Li),
+    apagar((incerto(Id, c) :- (apagar((excecao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))  :- incerto(Id,c)))))),
     insercao(negativo(Id,c)).
 
 evolucao( [cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) | R], impreciso ) :-
@@ -426,16 +473,16 @@ testa([H|T]) :- H, testa(T).
 % Não permitir a inserção de conhecimento interdito
 +prestador(Id,_,_,_) :: (solucoes( Id, (interdito(Id,p)),S ),
                                             comprimento( S,N ),
-                                                        N==0). 
+                                                        N==0).
 
 
 +utente(Id,_,_,_) :: (solucoes( Id, (interdito(Id,u)),S ),
                                             comprimento( S,N ),
-                                                        N==0). 
+                                                        N==0).
 
 +cuidado(Id,_,_,_,_,_,_) :: (solucoes( Id, (interdito(Id,c)),S ),
                                             comprimento( S,N ),
-                                                        N==0). 
+                                                        N==0).
 
 % Não permitir a inserção de conhecimento contraditório (com neg)
 +prestador( Id,Nome,Especialidade,Instituicao) :: ( solucoes( (Id), -prestador( Id,Nome,Especialidade,Instituicao), S ),
@@ -465,7 +512,7 @@ testa([H|T]) :- H, testa(T).
 +(-cuidado( Id,_,_,_,_,_ )) :: ( solucoes( (Id), negativo(Id,c), S ),
                             comprimento( S, N ),
                             N == 1 ).
-                            
+
 % Não permitir a inserção de conhecimento contraditório (com pos)
 +(-prestador( Id,Nome,Especialidade,Instituicao)) :: ( solucoes( (Id), prestador( Id,Nome,Especialidade,Instituicao), S ),
                             comprimento( S, N ),
@@ -518,11 +565,11 @@ inc(cuidado(Id,_,_,_,_,_,_)) :: (solucoes( (Id,_,_,_,_,_), (cuidado(Id,_,_,_,_,_
 % -------------------------------------------------------
 imp(prestador(Id,_,_,_)) :: (solucoes( Id, (interdito(Id,p)),S ),
                                             comprimento( S,N ),
-                                                N==0). 
-                                                
+                                                N==0).
+
 imp(utente(Id,_,_,_)) :: (solucoes( Id, (interdito(Id,u)),S ),
                                             comprimento( S,N ),
-                                                N==0). 
+                                                N==0).
 
 imp(cuidado(Id,_,_,_,_,_,_)) :: (solucoes( Id, (interdito(Id,c)),S ),
                                             comprimento( S,N ),
