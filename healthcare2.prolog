@@ -237,6 +237,10 @@ testa([H|T]) :- H, testa(T).
                                             comprimento( S,N ),
                                                         N==0).
 
++prestador(Id,Nome,Especialidade,Local) :: (solucoes( Id, (negativo(Id,p)),S ),
+                                            comprimento( S,N ),
+                                                        N==0).
+
 % Garantir que não existe conhecimento positivo contraditótio
 +(-prestador( Id,_,_,_)) :: ( solucoes( (Id), positivo(Id,p), S ),
                             comprimento( S, N ),
@@ -252,9 +256,21 @@ testa([H|T]) :- H, testa(T).
                                                 comprimento( S,N ),
 				                N==0).
 
++(-prestador(Id,_,_,_)) :: (solucoes( Id, (incerto(Id,p)),S ),
+                                                comprimento( S,N ),
+				                N==0).
+
 inc(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,_,_,_)),S ),
                                             comprimento( S,N ),
 				                N==1).
+
+inc(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( Id, (positivo(Id,p)),S ),
+                                            comprimento( S,N ),
+                                                        N==0).
+
+imp(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( Id, (positivo(Id,p)),S ),
+                                            comprimento( S,N ),
+                                                        N==0).
 
 imp(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( Id, (interdito(Id,p)),S ),
                                             comprimento( S,N ),
@@ -270,7 +286,11 @@ imp(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( (Id,Nome,Especialidade
 
 int(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,_,_,_)),S ),
                                             comprimento( S,N ),
-N==1).
+                                                N==1).
+
+int(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( Id, (positivo(Id,p)),S ),
+                                            comprimento( S,N ),
+                                                        N==0).
 %%TODO: adicionar prestador e cuidado
 +cuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Data,IdUt,IdPrest,Descricao,Custo), (cuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating)),S ),
         comprimento( S,N ),
