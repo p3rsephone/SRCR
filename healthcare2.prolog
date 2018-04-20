@@ -208,17 +208,13 @@ cuidado(2017-12-30,16,3,arritmia,150,65).
 % -------------- Conhecimento Imperfeito ----------------
 % --------------------- Cuidado -------------------------
 cuidado(noData,13,9,sopro_no_coracao,15,81).
-
-cuidado(2016-06-04,14,1,eczema,45,100).
-
+cuidado(2003-09-17,7,7,otite,30,noRating).
 cuidado(2003-09-17,15,2,constipacao,noCusto,70).
 
+cuidado(2016-06-04,14,1,eczema,45,100).
 cuidado(2017-12-30,16,3,osso_partido,150,65).
-
-cuidado(2008-03-22,noIdPrest,5,catarata,15,30).
+cuidado(2008-03-22,5,5,catarata,30,30).
 cuidado(2015-05-03,6,10,menopausa,45,42).
-cuidado(2003-09-17,7,7,otite,30,noRating).
-
 cuidado(2017-12-30,9,6,pele_irritada,150,70).
 % -------------------------------------------------------
 %  Registar utentes, prestadores e cuidados de saúde:
@@ -294,9 +290,15 @@ testa([H|T]) :- H, testa(T).
 
 +prestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,_,_,_) ; excecao(prestador(Id,_,_,_))),S ),
                                             comprimento( S,N ),
+<<<<<<< HEAD
 				                N==1).
         
 % Garantir que não existe conhecimento positivo contraditótio 
+=======
+				                            N==1).
+
+% Garantir que não existe conhecimento positivo contraditótio
+>>>>>>> develop
 % Não repetir conhecimento negativo
 +(-prestador( Id,Nome,Especialidade,Local )) :: ( solucoes( (Id), prestador(Id,Nome,Especialidade,Local), S ),
                             comprimento( S, N ),
@@ -346,7 +348,7 @@ involucao( P ) :- solucoes(Inv, -P::Inv, Li),
                 testa(Li).
 
 % involucao: F, Type -> {V,F}
-involucao( F,positivo ) :- 
+involucao( F,positivo ) :-
     solucoes(Inv, -F::Inv, Li),
     apagar(F),
     testa(Li).
@@ -428,7 +430,15 @@ impreciso(50,p).
 
 %TODO: Fazer para os outros.
 
-% ------------------------------------------------------
+excecao(cuidado(noData,13,9,sopro_no_coracao,15,81)).
+excecao(cuidado(2003-09-17,7,7,otite,30,noRating)).
+excecao(cuidado(2003-09-17,15,2,constipacao,noCusto,70)).
+excecao(cuidado(2016-06-04,14,1,eczema,45,100)).
+excecao(cuidado(2017-12-30,16,3,osso_partido,150,65)).
+excecao(cuidado(2008-03-22,5,5,catarata,30,30)).
+excecao(cuidado(2015-05-03,6,10,menopausa,45,42)).
+excecao(cuidado(2017-12-30,9,6,pele_irritada,150,70)).
+)% ------------------------------------------------------
 % -------------- Conhecimento Interdito ----------------
 % ------------------------------------------------------
 % Quando não se sabe nem nunca se vai saber algo de um utente
