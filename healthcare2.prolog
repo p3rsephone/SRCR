@@ -150,39 +150,18 @@ apagarPrestador(Id) :-
         apagar(prestador(Id,_,_,_)).
 
 % -------------------------------------------------------
-%  Evoluções:
+%  Evoluções prestador:
 % -------------------------------------------------------
 % evolucao: F, Type -> {V,F}
 
 evolucao( prestador(Id, Nome, E,Ins), positivo) :-
     solucoes(I, +prestador(Id,Nome,E,Ins)::I, Li),
     insercao(prestador(Id, Nome, E,Ins)),
-    testa(Li),
     insercao(positivo(Id,p)),
-    apagar((incerto(Id, p) :- (apagar((excecao(Id, _,_,_)  :- incerto(Id,p)))))).
-
-evolucao( utente(Id, Nome, Idade,Morada), positivo) :-
-    solucoes(I, +utente(Id,Nome,Idade,Morada)::I, Li),
-    insercao(utente(Id, Nome, Idade,Morada)),
     testa(Li),
-    insercao(positivo(Id,p)),
-    apagar((incerto(Id, p) :- (apagar((excecao(Id, _,_,_)  :- incerto(Id,p)))))).
-
-evolucao( cuidado(Id, Data, IdU,IdP, Descricao,Custo, Rating), positivo) :-
-    solucoes(I, +cuidado(Id, Data, IdU,IdP, Descricao,Custo, Rating)::I, Li),
-    insercao(cuidado(Id, Data, IdU,IdP, Descricao,Custo, Rating)),
-    testa(Li),
-    insercao(positivo(Id,p)),
-    apagar((incerto(Id, p) :- (apagar((excecao(Id, _,_,_,_,_)  :- incerto(Id,p)))))).
-
-evolucao( prestador(Id,Nome,Especialidade,Local) , positivo) :-
-    solucoes(I, +prestador(Id,Nome,Especialidade,Local)::I, Li),
-    insercao(prestador(Id,Nome,Especialidade,Local)),
-    testa(Li),
-    insercao(perfeito(Id,p)),
+    apagarPrestador(Id),
+    apagarIncerto(Id,p),
     subsImpreciso(Id,p).
-
-%-------------------------------------------------------------
 
 evolucao( prestador(Id,Nome,Especialidade,Local) , negativo ) :-
     solucoes( I, +(-prestador(Id,Nome,Especialidade,Local) )::I, Li ),
@@ -198,7 +177,6 @@ evolucao( [prestador(Id,Nome,Especialidade,Local) | R], impreciso ) :-
     apagarPrestador(Id),
     apagarIncerto(Id,p),
     evolucao( R,impreciso ).
-
 evolucao( [], impreciso ).
 
 evolucao( prestador( Id,Nome,Especialidade,Local ), incerto, local) :-
@@ -218,7 +196,6 @@ evolucao( prestador( Id,Nome,Especialidade,Local ), incerto, especialidade) :-
         insercao(prestador( Id,Nome,yyyy,Local )),
         testa(Li),
         insercao(incerto(Id,p)).
-% TODO: Everyone else
 
 evolucao( prestador( Id,Nome,Especialidade,Local ), interdito, local) :-
         solucoes(I, int(prestador(Id,Nome,Especialidade,Local))::I, Li),
@@ -228,7 +205,7 @@ evolucao( prestador( Id,Nome,Especialidade,Local ), interdito, local) :-
 
 evolucao( prestador( Id,Nome,Especialidade,Local ), interdito, nome) :-
         solucoes(I, int(prestador(Id,Nome,Especialidade,Local))::I, Li),
-        insercao(prestador( Id,noName,Especialidade,noLocal )),
+        insercao(prestador( Id,noName,Especialidade,Local)),
         insercao(interdito(Id,p)),
         testa(Li).
 
@@ -237,6 +214,171 @@ evolucao( prestador( Id,Nome,Especialidade,Local ), interdito, especialidade) :-
         insercao(prestador( Id,Nome,noEspecialidade,Local )),
         insercao(interdito(Id,p)),
         testa(Li).
+
+% -------------------------------------------------------
+%  Evoluções utente:
+% -------------------------------------------------------
+evolucao( utente(Id, Nome, Idade ,Local), positivo) :-
+    solucoes(I, +utente(Id, Nome, Idade ,Local)::I, Li),
+    insercao(utente(Id, Nome, Idade ,Local)),
+    insercao(positivo(Id,u)),
+    testa(Li),
+    apagar((incerto(Id, u) :- (apagar((excecao(utente(Id, Nome, Idade ,Local))  :- incerto(Id,u)))))),
+    subsImpreciso(Id,u).
+
+evolucao( utente(Id, Nome, Idade ,Local) , negativo ) :-
+    solucoes( I, +(-utente(Id, Nome, Idade ,Local) )::I, Li ),
+    insercao(-utente(Id, Nome, Idade ,Local) ),
+    testa(Li),
+    insercao(negativo(Id,u)).
+
+evolucao( [utente(Id, Nome, Idade ,Local) | R], impreciso ) :-
+    solucoes( Inv, imp(utente(Id, Nome, Idade ,Local))::Inv, L ),
+    insercao(excecao(utente(Id, Nome, Idade ,Local) )),
+    testa(L),
+    insercao(impreciso(Id,u)),
+    apagarUtente(Id),
+    apagarIncerto(Id,u),
+    evolucao( R,impreciso ).
+
+evolucao( [], impreciso ).
+
+evolucao( utente(Id, Nome, Idade ,Local), incerto, local) :-
+        solucoes(I, inc(utente(Id, Nome, Idade ,Local))::I, Li),
+        insercao(utente(Id, Nome, Idade ,xxxx)),
+        testa(Li),
+        insercao(incerto(Id,p)).
+
+evolucao( prestador( Id,Nome,Especialidade,Local ), incerto, nome) :-
+        solucoes(I, inc(utente(Id, Nome, Idade ,Local))::I, Li),
+        insercao(utente(Id, xxxx, Idade ,Local)),
+        testa(Li),
+        insercao(incerto(Id,u)).
+
+evolucao( utente(Id, Nome, Idade ,Local), incerto, idade) :-
+        solucoes(I, inc(utente(Id, Nome, Idade ,Local))::I, Li),
+        insercao(utente(Id, Nome, xxxx ,Local)),
+        testa(Li),
+        insercao(incerto(Id,u)).
+
+evolucao( utente(Id, Nome, Idade ,Local), interdito, local) :-
+        solucoes(I, int(utente(Id, Nome, Idade ,Local))::I, Li),
+        insercao(utente(Id, Nome, Idade ,noLocal)),
+        insercao(interdito(Id,u)),
+        testa(Li).
+
+evolucao( utente(Id, Nome, Idade ,Local), interdito, nome) :-
+        solucoes(I, int(utente(Id, Nome, Idade ,Local))::I, Li),
+        insercao(utente(Id, noName, Idade ,Local)),
+        insercao(interdito(Id,u)),
+        testa(Li).
+
+evolucao( utente(Id, Nome, Idade ,Local), interdito, idade) :-
+        solucoes(I, int(utente(Id, Nome, Idade ,Local))::I, Li),
+        insercao(utente(Id, Nome, noIdade ,Local)),
+        insercao(interdito(Id,u)),
+        testa(Li).
+
+% -------------------------------------------------------
+%  Evoluções cuidado:
+% -------------------------------------------------------
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), positivo) :-
+    solucoes(I, +cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating)::I, Li),
+    insercao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating)),
+    insercao(positivo(Id,c)),
+    testa(Li),
+    apagar((incerto(Id, c) :- (apagar((excecao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))  :- incerto(Id,c)))))),
+    subsImpreciso(Id,c).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) , negativo ) :-
+    solucoes( I, +(-cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) )::I, Li ),
+    insercao(-cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) ),
+    testa(Li),
+    insercao(negativo(Id,c)).
+
+evolucao( [cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) | R], impreciso ) :-
+    solucoes( Inv, imp(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::Inv, L ),
+    insercao(excecao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) )),
+    testa(L),
+    insercao(impreciso(Id,c)),
+    apagarCuidado(Id),
+    apagarIncerto(Id,c),
+    evolucao( R,impreciso ).
+
+evolucao( [], impreciso ).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, data) :-
+        solucoes(I, inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,zzzz,IdU,IdP,Tipo,Custo,Rating)),
+        testa(Li),
+        insercao(incerto(Id,c)).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, idu) :-
+        solucoes(I, inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,Data,zzzz,IdP,Tipo,Custo,Rating)),
+        testa(Li),
+        insercao(incerto(Id,c)).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, idp) :-
+        solucoes(I, inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,Data,IdU,zzzz,Tipo,Custo,Rating)),
+        testa(Li),
+        insercao(incerto(Id,c)).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, descricao) :-
+        solucoes(I, inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,Data,IdU,IdP,zzzz,Custo,Rating)),
+        testa(Li),
+        insercao(incerto(Id,c)).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, custo) :-
+        solucoes(I, inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,Data,IdU,IdP,Tipo,zzzz,Rating)),
+        testa(Li),
+        insercao(incerto(Id,c)).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, rating) :-
+        solucoes(I, inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,zzzz)),
+        testa(Li),
+        insercao(incerto(Id,c)).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, data) :-
+        solucoes(I, int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,noData,IdU,IdP,Tipo,Custo,Rating)),
+        insercao(interdito(Id,c)),
+        testa(Li).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, idu) :-
+        solucoes(I, int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,Data,noIdu,IdP,Tipo,Custo,Rating)),
+        insercao(interdito(Id,c)),
+        testa(Li).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, idp) :-
+        solucoes(I, int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,Data,IdU,noIdp,Tipo,Custo,Rating)),
+        insercao(interdito(Id,c)),
+        testa(Li).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, descricao) :-
+        solucoes(I, int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,Data,IdU,IdP,noDescricao,Custo,Rating)),
+        insercao(interdito(Id,c)),
+        testa(Li).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, custo) :-
+        solucoes(I, int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,Data,IdU,IdP,Tipo,noCusto,Rating)),
+        insercao(interdito(Id,c)),
+        testa(Li).
+
+evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, rating) :-
+        solucoes(I, int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        insercao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,noRating)),
+        insercao(interdito(Id,c)),
+        testa(Li).
+
 
 insercao(T) :- assert(T).
 insercao(T) :- retract(T),!,fail.
@@ -295,6 +437,18 @@ testa([H|T]) :- H, testa(T).
                                             comprimento( S,N ),
                                                         N==0). 
 
+% Não permitir a inserção de conhecimento contraditório (com neg)
++prestador( Id,Nome,Especialidade,Instituicao) :: ( solucoes( (Id), -prestador( Id,Nome,Especialidade,Instituicao), S ),
+                            comprimento( S, N ),
+                            N == 0 ).
+
++utente( Id,Nome,Idade,Morada ) :: ( solucoes( (Id), -utente( Id,Nome,Idade,Morada ), S ),
+                            comprimento( S, N ),
+                            N == 0 ).
+
++cuidado( Id,Data,Idu,Idp,Descricao,Custo,Rating ) :: ( solucoes( (Id), -cuidado( Id,Data,Idu,Idp,Descricao,Custo,Rating ), S ),
+                            comprimento( S, N ),
+                            N == 0 ).
 %--------------------------------------------------------
 % Invariantes de Conhecimento Negativo:  nao permitir a insercao de conhecimento
 %                                        repetido
@@ -312,51 +466,37 @@ testa([H|T]) :- H, testa(T).
                             comprimento( S, N ),
                             N == 1 ).
                             
-% Não permitir a inserção de conhecimento positivo contraditório
-+(-prestador( Id,_,_,_)) :: ( solucoes( (Id), positivo(Id,p), S ),
+% Não permitir a inserção de conhecimento contraditório (com pos)
++(-prestador( Id,Nome,Especialidade,Instituicao)) :: ( solucoes( (Id), prestador( Id,Nome,Especialidade,Instituicao), S ),
                             comprimento( S, N ),
                             N == 0 ).
 
-+(-utente( Id,_,_,_ )) :: ( solucoes( (Id), positivo(Id,u), S ),
++(-utente( Id,Nome,Idade,Morada )) :: ( solucoes( (Id), utente( Id,Nome,Idade,Morada ), S ),
                             comprimento( S, N ),
                             N == 0 ).
 
-+(-cuidado( Id,_,_,_,_,_ )) :: ( solucoes( (Id), positivo(Id,c), S ),
++(-cuidado( Id,Data,Idu,Idp,Descricao,Custo,Rating )) :: ( solucoes( (Id), cuidado( Id,Data,Idu,Idp,Descricao,Custo,Rating ), S ),
                             comprimento( S, N ),
                             N == 0 ).
 
-% Invariante que impede a inserção de conhecimento negativo acerca de conhecimento impreciso contraditório
+% Invariante que impede a inserção de conhecimento contraditório (com impreciso) e a atualização de conhecimento interdito
 +(-prestador(Id, Nome, Especialidade, Local)) :: (solucoes(
         (Id, Nome, Especialidade, Local),
         (excecao(prestador(Id,Nome,Especialidade,Local))),
         S),
-        comprimento(S,N), N==0)
+        comprimento(S,N), N==0).
 
 +(-utente(Id, Nome, Idade, Morada)) :: (solucoes(
         (Id, Nome, Idade, Morada),
         (excecao(prestador(Id,Nome,Idade,Morada))),
         S),
-        comprimento(S,N), N==0)
+        comprimento(S,N), N==0).
 
 +(-cuidado(Id, Data, IdU, IdP, Descricao, Custo, Rating)) :: (solucoes(
         (Id, Data, IdU, IdP, Nome, Descricao, Custo, Rating),
         (excecao(prestador(Id, Data, IdU, IdP,Nome,Descricao,Custo, Rating))),
         S),
-        comprimento(S,N), N==0)
-
-% Invariante que impede a inserção de conhecimento negativo acerca de conhecimento interdito
-+(-prestador(Id,_,_,_)) :: (solucoes( Id, (interdito(Id,p)),S ),
-                                                comprimento( S,N ),
-				                N==0).
-
-+(-utente( Id,_,_,_ )) :: ( solucoes( (Id), interdito(Id,u), S ),
-                            comprimento( S, N ),
-                            N == 0 ).
-
-+(-cuidado( Id,_,_,_,_,_ )) :: ( solucoes( (Id), interdito(Id,c), S ),
-                            comprimento( S, N ),
-                            N == 0 ).
-
+        comprimento(S,N), N==0).
 
 %--------------------------------------------------------
 % Invariantes de Conhecimento Incerto:  nao permitir a evolucao para                                                    conhecimento incerto
