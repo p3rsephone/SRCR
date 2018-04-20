@@ -17,6 +17,10 @@
 :- dynamic 'int'/1.
 :- dynamic 'inc'/1.
 :- dynamic 'imp'/1.
+:- dynamic perfeito/2.
+:- dynamic incerto/2.
+:- dynamic interdito/2.
+:- dynamic impreciso/2.
 :- dynamic utente/4.
 :- dynamic prestador/4.
 :- dynamic cuidado/6.
@@ -124,7 +128,6 @@ isNotEqual(A,B):- A\=B.
 % evolucao: F, Type -> {V,F}
 evolucao( F, positivo) :-
     solucoes(I, +F::I, Li),
-    nao(interdito(_,p)),
     insercao(F),
     testa(Li).
 
@@ -189,17 +192,17 @@ testa([H|T]) :- H, testa(T).
                                  comprimento( S,N ),
 				                 N==1).
 
-+prestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,_,_,_) ; excecao(prestador(Id,_,_,_))),S ),
++prestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,_,_,_) ,
                                             comprimento( S,N ),
 				                            N==1).
 
 % Garantir que não existe conhecimento positivo contraditótio
 % Não repetir conhecimento negativo
-+(-prestador( Id,Nome,Especialidade,Local )) :: ( solucoes( (Id), prestador(Id,Nome,Especialidade,Local), S ),
++(-prestador( Id,Nome,Especialidade,Local )) :: ( solucoes( (Id), perfeito(Id,p), S ),
                             comprimento( S, N ),
                             N == 0 ).
 
-+(-prestador( Id,Nome,Especialidade,Local )) :: ( solucoes( (Id), -prestador(Id,Nome,Especialidade,Local), S ),
++(-prestador( Id,Nome,Especialidade,Local )) :: ( solucoes( (Id), negativo(Id,p), S ),
                             comprimento( S, N ),
                             N == 1 ).
 % Invariante que impede a inserção de conhecimento negativo acerca de conhecimento interdito sobre a especialidade de utentes
@@ -215,48 +218,47 @@ testa([H|T]) :- H, testa(T).
 % Conhecimento interdito
 % -------------------------------------------------------
 
-intutente(Id,Nome,Idade,Local) :: (solucoes( (Id,Nome,Idade,Local), (utente(Id,Nome,Idade,Local)),S ),
+intutente(Id,Nome,Idade,Local) :: (solucoes( (Id), (perfeito(Id,u)),S ),
                                  comprimento( S,N ),
 				                 N==1).
 
-intprestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,Nome,Especialidade,Local)),S ),
+intprestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id), (perfeito(Id,p)),S ),
 
                                             comprimento( S,N ),
 				                            N==1).
 
-intcuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Data,IdUt,IdPrest,Descricao,Custo), (cuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating)),S ),
-                                                comprimento( S,N ),
+intcuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Id), (perfeito(Id,c)),S ),                                                comprimento( S,N ),
 				                                N==1).
-%--------------------------------------------------------
-% Conhecimento incerto
-% -------------------------------------------------------
+%%--------------------------------------------------------
+%% Conhecimento incerto
+%% -------------------------------------------------------
 
-incutente(Id,Nome,Idade,Local) :: (solucoes( (Id,Nome,Idade,Local), (utente(Id,Nome,Idade,Local)),S ),
+intutente(Id,Nome,Idade,Local) :: (solucoes( (Id), (perfeito(Id,u)),S ),
                                  comprimento( S,N ),
 				                 N==1).
 
-incprestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,Nome,Especialidade,Local)),S ),
+intprestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id), (perfeito(Id,p)),S ),
+
                                             comprimento( S,N ),
 				                            N==1).
 
-inccuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Data,IdUt,IdPrest,Descricao,Custo), (cuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating)),S ),
-                                                comprimento( S,N ),
+intcuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Id), (perfeito(Id,c)),S ),                                                comprimento( S,N ),
 				                                N==1).
 
-%--------------------------------------------------------
-% Conhecimento impreciso
-% -------------------------------------------------------
+%%--------------------------------------------------------
+%% Conhecimento impreciso
+%% -------------------------------------------------------
 
-imputente(Id,Nome,Idade,Local) :: (solucoes( (Id,Nome,Idade,Local), (utente(Id,Nome,Idade,Local)),S ),
+imputente(Id,Nome,Idade,Local) :: (solucoes( (Id), (perfeito(Id,u)),S ),
                                  comprimento( S,N ),
 				                 N==1).
 
-impprestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,Nome,Especialidade,Local)),S ),
+impprestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id), (perfeito(Id,p)),S ),
+
                                             comprimento( S,N ),
 				                            N==1).
 
-impcuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Data,IdUt,IdPrest,Descricao,Custo), (cuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating)),S ),
-                                                comprimento( S,N ),
+impcuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Id), (perfeito(Id,c)),S ),                                                comprimento( S,N ),
 				                                N==1).
 
 % -------------------------------------------------------
