@@ -14,6 +14,9 @@
 
 
 :- dynamic '-'/1.
+:- dynamic 'int'/1.
+:- dynamic 'inc'/1.
+:- dynamic 'imp'/1.
 :- dynamic utente/4.
 :- dynamic prestador/4.
 :- dynamic cuidado/6.
@@ -86,6 +89,7 @@ unicos([H|T], [H|R]) :-
 
 % Predicado comprimento:
 % Lista, Comprimento -> {V,F}
+comprimento([],0).
 comprimento([_H],1).
 comprimento([_H|T],N) :- comprimento(T,M), N is M+1.
 
@@ -120,19 +124,19 @@ isNotEqual(A,B):- A\=B.
 % evolucao: F, Type -> {V,F}
 evolucao( F, positivo) :-
     solucoes(I, +F::I, Li),
-    nao(interdito(Id,p)),
+    nao(interdito(_,p)),
     insercao(F),
     testa(Li).
 
 evolucao( F, negativo ) :-
     solucoes( I, +(-F)::I, Li ),
-    nao(interdito(Id,p)),
+    nao(interdito(_,p)),
     insercao(-F),
     testa(Li).
 
 evolucao( [OPT1 | R], impreciso ) :-
-    solucoes( Inv, +OPT1::Inv, L ),
-    nao(interdito(Id,p)),
+    solucoes( Inv, impOPT1::Inv, L ),
+    nao(interdito(_,p)),
     insercao(excecao(OPT1)),
     testa(L),
     evolucao( R,impreciso ).
@@ -140,35 +144,35 @@ evolucao( [OPT1 | R], impreciso ) :-
 evolucao( [], impreciso ).
 
 evolucao( prestador( Id,Nome,Especialidade,Local ), incerto, local) :-
-        solucoes(I, +F::I, Li),
+        solucoes(I, incF::I, Li),
         nao(interdito(Id,p)),
         insercao(prestador( Id,Nome,Especialidade,yyyy)),
         testa(Li).
 
 evolucao( prestador( Id,Nome,Especialidade,Local ), incerto, nome) :-
-        solucoes(I, +F::I, Li),
+        solucoes(I, incF::I, Li),
         nao(interdito(Id,p)),
         insercao(prestador( Id,yyyy,Especialidade,Local )),
         testa(Li).
 
 evolucao( prestador( Id,Nome,Especialidade,Local ), incerto, especialidade) :-
-        solucoes(I, +F::I, Li),
+        solucoes(I, incF::I, Li),
         nao(interdito(Id,p)),
         insercao(prestador( Id,Nome,yyyy,Local )),
         testa(Li).
 
 evolucao( prestador( Id,Nome,Especialidade,Local ), interdito, local) :-
-        solucoes(I, +F::I, Li),
+        solucoes(I, intF::I, Li),
         insercao(prestador( Id,Nome,Especialidade,noLocal )),
         testa(Li).
 
 evolucao( prestador( Id,Nome,Especialidade,Local ), interdito, nome) :-
-        solucoes(I, +F::I, Li),
+        solucoes(I, intF::I, Li),
         insercao(prestador( Id,noName,Especialidade,noLocal )),
         testa(Li).
 
 evolucao( prestador( Id,Nome,Especialidade,Local ), interdito, especialidade) :-
-        solucoes(I, +F::I, Li),
+        solucoes(I, intF::I, Li),
         insercao(prestador( Id,Nome,noEspecialidade,Local )),
         testa(Li).
 
@@ -207,6 +211,54 @@ testa([H|T]) :- H, testa(T).
                                                 comprimento( S,N ),
 				                                N==1).
 
+%--------------------------------------------------------
+% Conhecimento interdito
+% -------------------------------------------------------
+
+intutente(Id,Nome,Idade,Local) :: (solucoes( (Id,Nome,Idade,Local), (utente(Id,Nome,Idade,Local)),S ),
+                                 comprimento( S,N ),
+				                 N==1).
+
+intprestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,Nome,Especialidade,Local)),S ),
+
+                                            comprimento( S,N ),
+				                            N==1).
+
+intcuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Data,IdUt,IdPrest,Descricao,Custo), (cuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating)),S ),
+                                                comprimento( S,N ),
+				                                N==1).
+%--------------------------------------------------------
+% Conhecimento incerto
+% -------------------------------------------------------
+
+incutente(Id,Nome,Idade,Local) :: (solucoes( (Id,Nome,Idade,Local), (utente(Id,Nome,Idade,Local)),S ),
+                                 comprimento( S,N ),
+				                 N==1).
+
+incprestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,Nome,Especialidade,Local)),S ),
+                                            comprimento( S,N ),
+				                            N==1).
+
+inccuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Data,IdUt,IdPrest,Descricao,Custo), (cuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating)),S ),
+                                                comprimento( S,N ),
+				                                N==1).
+
+%--------------------------------------------------------
+% Conhecimento impreciso
+% -------------------------------------------------------
+
+imputente(Id,Nome,Idade,Local) :: (solucoes( (Id,Nome,Idade,Local), (utente(Id,Nome,Idade,Local)),S ),
+                                 comprimento( S,N ),
+				                 N==1).
+
+impprestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,Nome,Especialidade,Local)),S ),
+                                            comprimento( S,N ),
+				                            N==1).
+
+impcuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Data,IdUt,IdPrest,Descricao,Custo), (cuidado(Data,IdUt,IdPrest,Descricao,Custo,Rating)),S ),
+                                                comprimento( S,N ),
+				                                N==1).
+
 % -------------------------------------------------------
 % Invariante Referencial : não permitir a inserção de utentes/prestadores
 %                          com o mesmo ID
@@ -219,7 +271,7 @@ testa([H|T]) :- H, testa(T).
                                          comprimento( S,N ),
    			                             N==1).
 
-+prestador(Id,Name,Especialidade, Local) :: (solucoes(Especialidade,(prestador(Id, Name,Especialidade,Local), nao(nulo(Especialidade))), L),
++prestador(Id,Name,Especialidade, Local) :: (solucoes(Especialidade,(prestador(Id, Name,Especialidade,Local), (nulo(Especialidade))), L),
                                             comprimento(L, N),
                                             N==0).
 
