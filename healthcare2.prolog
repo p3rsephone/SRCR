@@ -127,7 +127,19 @@ subsImpreciso(Id,p):-
         solucoes(excecao(prestador(Id,N,E,L)),excecao(prestador(Id,N,E,L)),N),
         apagarTudo(N),
         apagar(impreciso(Id,p)).
+subsImpreciso(Id,u):-
+        impreciso(Id,u),
+        solucoes(excecao(utente(Id,N,E,L)),excecao(utente(Id,N,E,L)),N),
+        apagarTudo(N),
+        apagar(impreciso(Id,u)).
+subsImpreciso(Id,c):-
+        impreciso(Id,c),
+        solucoes(excecao(cuidado(IdCuidado, Data, idUt, IdPrest, Descrição, Custo, Rating)),excecao(cuidado(IdCuidado, Data, idUt, IdPrest, Descrição, Custo, Rating))),N),
+        apagarTudo(N),
+        apagar(impreciso(Id,c)).
 subsImpreciso(Id,p).
+subsImpreciso(Id,c).
+subsImpreciso(Id,u).
 
 % Predicado apagarTudo
 % Apaga todos os predicados da lista
