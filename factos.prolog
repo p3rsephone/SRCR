@@ -5,6 +5,9 @@
 :- dynamic utente/4.
 :- dynamic prestador/4.
 :- dynamic cuidado/6.
+
+:- set_prolog_flag( discontiguous_warnings,off ).
+:- set_prolog_flag( single_var_warnings,off ).
 % -------------------------------------------------------
 % ---------------------- Factos -------------------------
 % -------------------------------------------------------
