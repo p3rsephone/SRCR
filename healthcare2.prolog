@@ -492,13 +492,13 @@ imp(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( (Id,Nome,Especialidade
                                             comprimento( S,N ),
 				                N==0).
 
-imp(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,Nome, Especialidade, Local)),S ),
+imp(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( (Id,Nome,Especialidade,Local), (excecao(prestador(Id,Nome, Especialidade, Local))),S ),
                                             comprimento( S,N ),
 				                N==1).
 
 int(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,_,_,_)),S ),
                                             comprimento( S,N ),
-N==1).
+                                        N==1).
 %%TODO: adicionar prestador e cuidado
 +cuidado(Id,Data,IdUt,IdPrest,Descricao,Custo,Rating) :: (solucoes( (Id,Data,IdUt,IdPrest,Descricao,Custo), (cuidado(Id,Data,IdUt,IdPrest,Descricao,Custo,Rating)),S ),
         comprimento( S,N ),
