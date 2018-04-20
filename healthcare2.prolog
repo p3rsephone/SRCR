@@ -243,7 +243,7 @@ testa([H|T]) :- H, testa(T).
                             N == 0 ).
 
 % Não repetir conhecimento negativo
-+(-prestador( Id,Nome,Especialidade,Local)) :: ( solucoes( (Id,Nome,Especialidade,Local), prestador(Id,Nome,Especialidade,Local), S ),
++(-prestador( Id,Nome,Especialidade,Local)) :: ( solucoes( (Id,Nome,Especialidade,Local), -prestador(Id,Nome,Especialidade,Local), S ),
                             comprimento( S, N ),
                             N == 1 ).
 
