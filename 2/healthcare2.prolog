@@ -216,6 +216,7 @@ insercao(T) :- retract(T),!,fail.
 
 testa([]).
 testa([H|T]) :- H, testa(T).
+        
 %--------------------------------------------------------
 % Invariante Estrutural:  nao permitir a insercao de conhecimento
 %                         repetido
