@@ -179,14 +179,14 @@ evolucao( prestador(Id, Nome, E,Ins), positivo) :-
 evolucao( prestador(Id,Nome,Especialidade,Local) , negativo ) :-
     solucoes( I, +(-prestador(Id,Nome,Especialidade,Local) )::I, Li ),
     insercao(-prestador(Id,Nome,Especialidade,Local) ),
-    testa(Li),
-    insercao(negativo(Id,p)).
+    insercao(negativo(Id,p)),
+    testa(Li).
 
 evolucao( [prestador(Id,Nome,Especialidade,Local) | R], impreciso ) :-
     solucoes( Inv, imp(prestador(Id,Nome,Especialidade,Local))::Inv, L ),
     insercao(excecao(prestador(Id,Nome,Especialidade,Local) )),
-    testa(L),
     insercao(impreciso(Id,p)),
+    testa(L),
     apagarPrestador(Id),
     apagarIncerto(Id,p),
     evolucao( R,impreciso ).
@@ -248,14 +248,14 @@ evolucao( utente(Id, Nome, Idade ,Local), positivo) :-
 evolucao( utente(Id, Nome, Idade ,Local) , negativo ) :-
     solucoes( I, +(-utente(Id, Nome, Idade ,Local) )::I, Li ),
     insercao(-utente(Id, Nome, Idade ,Local) ),
-    testa(Li),
-    insercao(negativo(Id,u)).
+    insercao(negativo(Id,u)),
+    testa(Li).
 
 evolucao( [utente(Id, Nome, Idade ,Local) | R], impreciso ) :-
     solucoes( Inv, imp(utente(Id, Nome, Idade ,Local))::Inv, L ),
     insercao(excecao(utente(Id, Nome, Idade ,Local) )),
-    testa(L),
     insercao(impreciso(Id,u)),
+    testa(L),
     apagarUtente(Id),
     apagarIncerto(Id,u),
     evolucao( R,impreciso ).
@@ -317,14 +317,14 @@ evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), positivo) :-
 evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) , negativo ) :-
     solucoes( I, +(-cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) )::I, Li ),
     insercao(-cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) ),
-    testa(Li),
-    insercao(negativo(Id,c)).
+    insercao(negativo(Id,c)),
+    testa(Li).
 
 evolucao( [cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) | R], impreciso ) :-
     solucoes( Inv, imp(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::Inv, L ),
     insercao(excecao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) )),
-    testa(L),
     insercao(impreciso(Id,c)),
+    testa(L),
     apagarCuidado(Id),
     apagarIncerto(Id,c),
     evolucao( R,impreciso ).
