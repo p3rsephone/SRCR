@@ -241,7 +241,8 @@ evolucao( utente(Id, Nome, Idade ,Local), positivo) :-
     insercao(utente(Id, Nome, Idade ,Local)),
     insercao(positivo(Id,u)),
     testa(Li),
-    apagar((incerto(Id, u) :- (apagar((excecao(utente(Id, Nome, Idade ,Local))  :- incerto(Id,u)))))),
+    apagarUtente(Id),
+    apagarIncerto(Id,u),
     subsImpreciso(Id,u).
 
 evolucao( utente(Id, Nome, Idade ,Local) , negativo ) :-
@@ -309,7 +310,8 @@ evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), positivo) :-
     insercao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating)),
     insercao(positivo(Id,c)),
     testa(Li),
-    apagar((incerto(Id, c) :- (apagar((excecao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))  :- incerto(Id,c)))))),
+    apagarPrestador(Id),
+    apagarIncerto(Id,c),
     subsImpreciso(Id,c).
 
 evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) , negativo ) :-
