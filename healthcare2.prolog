@@ -21,12 +21,6 @@
 % --------------- Predicados auxiliares -----------------
 % -------------------------------------------------------
 
-% Extensao do meta-predicado demo :: Expressão, Resposta -> {V,F}
-demo( P <=> X, V ) :- demo( P, V1 ), demo( X, V2 ), equivalencia( V1, V2, V ), !.
-demo( P => X, V ) :- demo( P, V1 ), demo( X, V2 ), implicacao( V1, V2, V ), !.
-demo( P $$ X, V ) :- demo( P, V1 ), demo( X, V2 ), disjuncao( V1, V2, V ), !.
-demo( P && X, V ) :- demo( P, V1 ), demo( X, V2 ), conjuncao( V1, V2, V ), !.
-
 equivalencia( X, X, verdadeiro ) :- X \= desconhecido.
 equivalencia( desconhecido, Y, desconhecido ).
 equivalencia( X, desconhecido, desconhecido ).
@@ -60,6 +54,12 @@ demo( Questao,falso ) :-
 demo( Questao,desconhecido ) :-
     nao( Questao ),
     nao( -Questao ).
+
+% Extensao do meta-predicado demo :: Expressão, Resposta -> {V,F}
+demo( P <=> X, V ) :- demo( P, V1 ), demo( X, V2 ), equivalencia( V1, V2, V ), !.
+demo( P => X, V ) :- demo( P, V1 ), demo( X, V2 ), implicacao( V1, V2, V ), !.
+demo( P $$ X, V ) :- demo( P, V1 ), demo( X, V2 ), disjuncao( V1, V2, V ), !.
+demo( P && X, V ) :- demo( P, V1 ), demo( X, V2 ), conjuncao( V1, V2, V ), !.
 
 % Predicado pertence:
 % Elemento, Lista -> {V,F}
@@ -292,8 +292,8 @@ testa([H|T]) :- H, testa(T).
                                             comprimento( S,N ),
 <<<<<<< HEAD
 				                N==1).
-        
-% Garantir que não existe conhecimento positivo contraditótio 
+
+% Garantir que não existe conhecimento positivo contraditótio
 =======
 				                            N==1).
 
