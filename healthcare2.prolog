@@ -16,6 +16,9 @@
 :- dynamic inc/1.  % operador de invariante incerto
 :- dynamic imp/1.  % operador de impreciso
 :- dynamic '-'/1.
+:- dynamic excecao/1.
+:- dynamic positivo/2.
+:- dynamic negativo/2.
 
 
 % -------------------------------------------------------
@@ -124,17 +127,17 @@ isNotEqual(A,B):- A\=B.
 % Vê se existem predicados imprecisos com aquele ID e se existirem apaga-os
 subsImpreciso(Id,p):-
         impreciso(Id,p),
-        solucoes(excecao(prestador(Id,N,E,L)),excecao(prestador(Id,N,E,L)),N),
+        solucoes((excecao(prestador(Id,N,E,L))),excecao(prestador(Id,N,E,L)),N),
         apagarTudo(N),
         apagar(impreciso(Id,p)).
 subsImpreciso(Id,u):-
         impreciso(Id,u),
-        solucoes(excecao(utente(Id,N,E,L)),excecao(utente(Id,N,E,L)),N),
+        solucoes((excecao(utente(Id,N,E,L))),excecao(utente(Id,N,E,L)),N),
         apagarTudo(N),
         apagar(impreciso(Id,u)).
 subsImpreciso(Id,c):-
         impreciso(Id,c),
-        solucoes(excecao(cuidado(IdCuidado, Data, idUt, IdPrest, Descrição, Custo, Rating)),excecao(cuidado(IdCuidado, Data, idUt, IdPrest, Descrição, Custo, Rating))),N),
+        solucoes((excecao(cuidado(IdCuidado, Data, idUt, IdPrest, Descrição, Custo, Rating))),excecao(cuidado(IdCuidado, Data, idUt, IdPrest, Descrição, Custo, Rating))),N),
         apagarTudo(N),
         apagar(impreciso(Id,c)).
 subsImpreciso(Id,p).
@@ -150,10 +153,10 @@ apagarTudo([]).
 
 % Predicado apagarIncerto
 % Vê se existe um predicado incerto com aquele ID e se existir apaga-o
-apagarIncerto(Id,p) :-
-        incerto(Id,p),
-        apagar(incerto(Id,p)).
-apagarIncerto(Id,p).
+apagarIncerto(Id,T) :-
+        incerto(Id,T),
+        apagar(incerto(Id,T)).
+apagarIncerto(Id,T).
 
 % Predicado apagarNegativoC
 % Vê se existe um predicado negativo com aquele ID e se existir apaga-o
@@ -181,24 +184,36 @@ apagarNegativoP(Id,p).
 apagarPrestador(Id) :-
         incerto(Id,p),
         apagar(prestador(Id,_,_,_)).
+apagarPrestador(Id).
 
+apagarUtente(Id) :-
+        incerto(Id,u),
+        apagar(utente(Id,_,_,_)).
+apagarUtente(Id).
+
+apagarCuidado(Id) :-
+        incerto(Id,c),
+        apagar(cuidado(Id,_,_,_,_,_,_)).
+apagarCuidado(Id).
 % Predicado apagarPrestadorNegativo
 % Vê se existe um predicado negativo com aquele ID e se existir apaga o prestador correspondente
 apagarPrestadorNegativo(Id) :-
         negativo(Id,p),
         apagar(prestador(Id,_,_,_)).
+apagarPrestadorNegativo(Id).
       %
 % Predicado apagarUtenteNegativo
 % Vê se existe um predicado negativo com aquele ID e se existir apaga o utente correspondente
 apagarUtenteNegativo(Id) :-
         negativo(Id,u),
         apagar(utente(Id,_,_,_)).
-
+apagarUtenteNegativo(Id).
 % Predicado apagarCuidadoNegativo
 % Vê se existe um predicado negativo com aquele ID e se existir apaga o cuidado correspondente
 apagarCuidadoNegativo(Id) :-
         negativo(Id,c),
         apagar(cuidado(Id,_,_,_,_,_,_)).
+apagarCuidadoNegativo(Id).
 % -------------------------------------------------------
 %  Evoluções prestador:
 % -------------------------------------------------------
@@ -211,7 +226,7 @@ evolucao( prestador(Id, Nome, E,Ins), positivo) :-
     testa(Li),
     apagarPrestador(Id),
     apagarIncerto(Id,p),
-    apagarPrestadorNegativo(Id,p),
+    apagarPrestadorNegativo(Id),
     apagarNegativoP(Id,p),
     subsImpreciso(Id,p).
 
@@ -633,52 +648,226 @@ int(cuidado(Id,_,_,_,_,_,_)) :: (solucoes( (Id,_,_,_,_,_,_), (cuidado(Id,_,_,_,_
 %  Involuções:
 % -------------------------------------------------------
 % involucao: F -> {V,F}
-involucao( P ) :- solucoes(Inv, -P::Inv, Li),
-                apagar(P),
-                testa(Li).
-
-% involucao: F, Type -> {V,F}
-involucao( F,positivo ) :-
-    solucoes(Inv, -F::Inv, Li),
-    apagar(F),
+involucao( prestador(Id, Nome, E,Ins), positivo) :-
+    solucoes(I, -prestador(Id,Nome,E,Ins)::I, Li),
+    apagar(prestador(Id, Nome, E,Ins)),
+    apagar(positivo(Id,p)),
     testa(Li).
 
-involucao( F,negativo ) :-
-    solucoes(Inv, -(-F)::Inv, Li),
-    apagar(F),
-    testa(Li).
+involucao( prestador(Id,Nome,Especialidade,Local) , negativo ) :-
+    solucoes( I, -(-prestador(Id,Nome,Especialidade,Local) )::I, Li ),
+    apagar(-prestador(Id,Nome,Especialidade,Local) ),
+    testa(Li),
+    apagar(negativo(Id,p)).
 
-involucao( [OPT1 | R], impreciso ) :-
-    solucoes( Inv, -OPT1::Inv, L ),
-    apagar(excecao(OPT1)),
+involucao( [prestador(Id,Nome,Especialidade,Local) | R], impreciso ) :-
+    solucoes( Inv, -imp(prestador(Id,Nome,Especialidade,Local))::Inv, L ),
+    apagar(excecao(prestador(Id,Nome,Especialidade,Local) )),
     testa(L),
-    involucao( R,impreciso ).
+    apagar(impreciso(Id,p)),
+    evolucao( R,impreciso ).
 
 involucao( [], impreciso ).
 
-involucao( prestador( Id,Nome,Especialidade,_ ), incerto, local) :-
-        involucao( prestador( Id,Nome,Especialidade,yyyy ), positivo ).
+involucao( prestador( Id,Nome,Especialidade,Local ), incerto, local) :-
+        solucoes(I, -inc(prestador(Id,Nome,Especialidade,Local))::I, Li),
+        apagar(prestador( Id,Nome,Especialidade,yyyy)),
+        testa(Li),
+        apagar(incerto(Id,p)).
 
-involucao( prestador( Id,_,Especialidade,Local ), incerto, nome) :-
-        involucao( prestador( Id,yyyy,Especialidade,Local ), positivo ).
+involucao( prestador( Id,Nome,Especialidade,Local ), incerto, nome) :-
+        solucoes(I, -inc(prestador(Id,Nome,Especialidade,Local))::I, Li),
+        apagar(prestador( Id,yyyy,Especialidade,Local )),
+        testa(Li),
+        apagar(incerto(Id,p)).
 
-involucao( prestador( Id,Nome,_,Local ), incerto, especialidade) :-
-        involucao( prestador( Id,Nome,yyyy,Local ), positivo ).
-
-involucao( prestador( Id,Nome,Especialidade,Local ), incerto, id) :-
-        involucao( prestador( yyyy,Nome,Especialidade,Local ), positivo ).
+involucao( prestador( Id,Nome,Especialidade,Local ), incerto, especialidade) :-
+        solucoes(I, -inc(prestador(Id,Nome,Especialidade,Local))::I, Li),
+        apagar(prestador( Id,Nome,yyyy,Local )),
+        testa(Li),
+        apagar(incerto(Id,p)).
+% TODO: Everyone else
 
 involucao( prestador( Id,Nome,Especialidade,Local ), interdito, local) :-
-        involucao( prestador( Id,Nome,Especialidade,noLocal ), positivo ).
+        solucoes(I, -int(prestador(Id,Nome,Especialidade,Local))::I, Li),
+        apagar(prestador( Id,Nome,Especialidade,noLocal )),
+        apagar(interdito(Id,p)),
+        testa(Li).
 
 involucao( prestador( Id,Nome,Especialidade,Local ), interdito, nome) :-
-        involucao( prestador( Id,noName,Especialidade,Local ), positivo ).
+        solucoes(I, -int(prestador(Id,Nome,Especialidade,Local))::I, Li),
+        apagar(prestador( Id,noName,Especialidade,Local)),
+        apagar(interdito(Id,p)),
+        testa(Li).
 
-involucao( prestador( Id,Nome,Especialidade,Local ), interdito, especialidade):-
-        involucao( prestador( Id,Nome,noEspecialidade,Local ), positivo ).
+involucao( prestador( Id,Nome,Especialidade,Local ), interdito, especialidade) :-
+        solucoes(I, -int(prestador(Id,Nome,Especialidade,Local))::I, Li),
+        apagar(prestador( Id,Nome,noEspecialidade,Local )),
+        apagar(interdito(Id,p)),
+        testa(Li).
 
-involucao( prestador( Id,Nome,Especialidade,Local ), interdito, id) :-
-        involucao( prestador( noId,Nome,Especialidade,Local ), positivo ).
+
+%--------------------------------------------------------
+%------------------involucao utente
+%--------------------------------------------------------
+
+
+involucao( utente(Id, Nome, Idade ,Local), positivo) :-
+    solucoes(I, -utente(Id, Nome, Idade ,Local)::I, Li),
+    apagar(utente(Id, Nome, Idade ,Local)),
+    apagar(positivo(Id,u)),
+    testa(Li).
+
+involucao( utente(Id, Nome, Idade ,Local) , negativo ) :-
+    solucoes( I, -(-utente(Id, Nome, Idade ,Local) )::I, Li ),
+    apagar(-utente(Id, Nome, Idade ,Local) ),
+    testa(Li),
+    apagar(negativo(Id,u)).
+
+involucao( [utente(Id, Nome, Idade ,Local) | R], impreciso ) :-
+    solucoes( Inv, -imp(utente(Id, Nome, Idade ,Local))::Inv, L ),
+    apagar(excecao(utente(Id, Nome, Idade ,Local) )),
+    testa(L),
+    apagar(impreciso(Id,u)),
+    evolucao( R,impreciso ).
+
+involucao( [], impreciso ).
+
+involucao( utente(Id, Nome, Idade ,Local), incerto, local) :-
+        solucoes(I, -inc(utente(Id, Nome, Idade ,Local))::I, Li),
+        apagar(utente(Id, Nome, Idade ,xxxx)),
+        testa(Li),
+        apagar(incerto(Id,p)).
+
+involucao( prestador( Id,Nome,Especialidade,Local ), incerto, nome) :-
+        solucoes(I, -inc(utente(Id, Nome, Idade ,Local))::I, Li),
+        apagar(utente(Id, xxxx, Idade ,Local)),
+        testa(Li),
+        apagar(incerto(Id,u)).
+
+involucao( utente(Id, Nome, Idade ,Local), incerto, idade) :-
+        solucoes(I, -inc(utente(Id, Nome, Idade ,Local))::I, Li),
+        apagar(utente(Id, Nome, xxxx ,Local)),
+        testa(Li),
+        apagar(incerto(Id,u)).
+% TODO: Everyone else
+
+involucao( utente(Id, Nome, Idade ,Local), interdito, local) :-
+        solucoes(I, -int(utente(Id, Nome, Idade ,Local))::I, Li),
+        apagar(utente(Id, Nome, Idade ,noLocal)),
+        apagar(interdito(Id,u)),
+        testa(Li).
+
+involucao( utente(Id, Nome, Idade ,Local), interdito, nome) :-
+        solucoes(I, -int(utente(Id, Nome, Idade ,Local))::I, Li),
+        apagar(utente(Id, noName, Idade ,Local)),
+        apagar(interdito(Id,u)),
+        testa(Li).
+
+involucao( utente(Id, Nome, Idade ,Local), interdito, idade) :-
+        solucoes(I, -int(utente(Id, Nome, Idade ,Local))::I, Li),
+        apagar(utente(Id, Nome, noIdade ,Local)),
+        apagar(interdito(Id,u)),
+        testa(Li).
+
+
+%--------------------------------------------------------
+%------------------involucao cuidados
+%--------------------------------------------------------
+
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), positivo) :-
+    solucoes(I, -cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating)::I, Li),
+    apagar(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating)),
+    insercao(positivo(Id,c)),
+    testa(Li).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) , negativo ) :-
+    solucoes( I, -(-cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) )::I, Li ),
+    apagar(-cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) ),
+    testa(Li),
+    apagar(negativo(Id,c)).
+
+involucao( [cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) | R], impreciso ) :-
+    solucoes( Inv, -imp(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::Inv, L ),
+    apagar(excecao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) )),
+    testa(L),
+    apagar(impreciso(Id,c)),
+    evolucao( R,impreciso ).
+
+involucao( [], impreciso ).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, data) :-
+        solucoes(I, -inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,zzzz,IdU,IdP,Tipo,Custo,Rating)),
+        testa(Li),
+        apagar(incerto(Id,c)).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, idu) :-
+        solucoes(I, -inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,Data,zzzz,IdP,Tipo,Custo,Rating)),
+        testa(Li),
+        apagar(incerto(Id,c)).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, idp) :-
+        solucoes(I, -inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,Data,IdU,zzzz,Tipo,Custo,Rating)),
+        testa(Li),
+        apagar(incerto(Id,c)).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, descricao) :-
+        solucoes(I, -inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,Data,IdU,IdP,zzzz,Custo,Rating)),
+        testa(Li),
+        apagar(incerto(Id,c)).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, custo) :-
+        solucoes(I, -inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,Data,IdU,IdP,Tipo,zzzz,Rating)),
+        testa(Li),
+        apagar(incerto(Id,c)).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), incerto, rating) :-
+        solucoes(I, -inc(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,Data,IdU,IdP,Tipo,Custo,zzzz)),
+        testa(Li),
+        apagar(incerto(Id,c)).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, data) :-
+        solucoes(I, -int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,noData,IdU,IdP,Tipo,Custo,Rating)),
+        apagar(interdito(Id,c)),
+        testa(Li).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, idu) :-
+        solucoes(I, -int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,Data,noIdu,IdP,Tipo,Custo,Rating)),
+        apagar(interdito(Id,c)),
+        testa(Li).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, idp) :-
+        solucoes(I, -int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,Data,IdU,noIdp,Tipo,Custo,Rating)),
+        apagar(interdito(Id,c)),
+        testa(Li).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, descricao) :-
+        solucoes(I, -int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,Data,IdU,IdP,noDescricao,Custo,Rating)),
+        apagar(interdito(Id,c)),
+        testa(Li).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, custo) :-
+        solucoes(I, -int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,Data,IdU,IdP,Tipo,noCusto,Rating)),
+        apagar(interdito(Id,c)),
+        testa(Li).
+
+involucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating), interdito, rating) :-
+        solucoes(I, -int(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::I, Li),
+        apagar(cuidado(Id,Data,IdU,IdP,Tipo,Custo,noRating)),
+        apagar(interdito(Id,c)),
+        testa(Li).
 
 apagar(T) :- retract(T).
 apagar(T) :- assert(T),!,fail.
@@ -750,6 +939,8 @@ excecao(prestador(Id,_,Especialidade,Local)):- prestador(Id,noName,Especialidade
 excecao(prestador(Id,Nome,_,Local)):- prestador(Id,Nome,noEspecialidade,Local).
 excecao(prestador(Id,Nome,Especialidade,_)):- prestador(Id,Nome,Especialidade,noLocal).
 
+nulo(noIdu).
+nulo(noIdp).
 nulo(noName).
 nulo(noIdade).
 nulo(noLocal).
