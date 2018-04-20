@@ -47,7 +47,7 @@ conjuncao( desconhecido, verdadeiro, desconhecido ).
 conjuncao( verdadeiro, desconhecido, desconhecido ).
 
 %TODO: Pressuposto do mundo fechado de TUDO
-%       -utente(Id,N,I,S,C) :- 
+%       -utente(Id,N,I,S,C) :-
 %          nao(utente(Id,N,I,S,C)),
 %          nao(excecao(utente(Id,N,I,S,C))).
 
@@ -262,6 +262,7 @@ testa([H|T]) :- H, testa(T).
 
 +cuidado(Id, Data, IdU,IdP, Descricao,Custo, Rating) :: (solucoes( (Id, Data, IdU,IdP, Descricao,Custo), cuidado(Id, Data, IdU,IdP, Descricao,Custo, Rating), S ),
                                             comprimento( S,N ),
+
 				                            N==1).
 
 % Não permitir a inserção de conhecimento já existente positivo
@@ -269,9 +270,11 @@ testa([H|T]) :- H, testa(T).
                                          comprimento( S,N ),
    			                             N==1).
 
+
 +utente(Id,_,_,_) :: (solucoes( (Id), positivo(Id,u),S ),
                                  comprimento( S,N ),
 				                 N==1).
+
 
 
 +cuidado(Id,_,_,_,_,_,_) :: (solucoes( (Id), positivo(Id,c),S ),
@@ -282,6 +285,7 @@ testa([H|T]) :- H, testa(T).
 +prestador(Id,_,_,_) :: (solucoes( Id, (interdito(Id,p)),S ),
                                             comprimento( S,N ),
                                                         N==0). 
+
 
 +utente(Id,_,_,_) :: (solucoes( Id, (interdito(Id,u)),S ),
                                             comprimento( S,N ),
