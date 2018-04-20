@@ -22,19 +22,19 @@
 % -------------------------------------------------------
 
 equivalencia( X, X, verdadeiro ) :- X \= desconhecido.
-equivalencia( desconhecido, Y, desconhecido ).
-equivalencia( X, desconhecido, desconhecido ).
+equivalencia( desconhecido, _, desconhecido ).
+equivalencia( _, desconhecido, desconhecido ).
 equivalencia( verdadeiro, falso, falso ).
 equivalencia( falso, verdadeiro, falso ).
 
-implicacao( falso, X, verdadeiro ).
-implicacao( X, verdadeiro, verdadeiro ).
+implicacao( falso, _, verdadeiro ).
+implicacao( _, verdadeiro, verdadeiro ).
 implicacao( verdadeiro, desconhecido, desconhecido ).
 implicacao( desconhecido, X, desconhecido ) :- X \= verdadeiro.
 implicacao( verdadeiro, falso, falso ).
 
-disjuncao( verdadeiro, X, verdadeiro ).
-disjuncao( X, verdadeiro, verdadeiro ).
+disjuncao( verdadeiro, _, verdadeiro ).
+disjuncao( _, verdadeiro, verdadeiro ).
 disjuncao( desconhecido, Y, desconhecido ) :- Y \= verdadeiro.
 disjuncao( Y, desconhecido, desconhecido ) :- Y \= verdadeiro.
 disjuncao( falso, falso, falso ).
@@ -63,15 +63,15 @@ demo( P && X, V ) :- demo( P, V1 ), demo( X, V2 ), conjuncao( V1, V2, V ), !.
 
 % Predicado pertence:
 % Elemento, Lista -> {V,F}
-pertence(H,[H|_T]).
-pertence(X,[H|_T]) :-
+pertence(H,[H|_]).
+pertence(X,[H|T]) :-
 	X \= H,
-pertence(X,_T).
+        pertence(X,T).
 
 % Predicado de negação nao:
 % Predicado -> {V,F}
-nao(_Q) :- _Q,!,false.
-nao(_Q).
+nao(Q) :- Q,!,false.
+nao(_).
 
 % Predicado unico:
 % Lista1, Lista2 -> {V,F}
@@ -115,6 +115,39 @@ isNotEqual(A,B):- A\=B.
 % -------------------------------------------------------
 % ---------------------- Factos -------------------------
 % -------------------------------------------------------
+perfeito(1,p).
+perfeito(2,p).
+perfeito(3,p).
+perfeito(4,p).
+perfeito(5,p).
+perfeito(6,p).
+perfeito(7,p).
+perfeito(8,p).
+perfeito(9,p).
+perfeito(10,p).
+perfeito(11,p).
+perfeito(12,p).
+perfeito(1,u).
+perfeito(2,u).
+perfeito(3,u).
+perfeito(4,u).
+perfeito(5,u).
+perfeito(6,u).
+perfeito(7,u).
+perfeito(8,u).
+perfeito(9,u).
+perfeito(10,u).
+perfeito(11,u).
+perfeito(12,u).
+perfeito(13,u).
+perfeito(14,u).
+perfeito(15,u).
+perfeito(16,u).
+
+interdito(55,p).
+incerto(54,p).
+impreciso(50,p).
+impreciso(100,u).
 
 utente(1, mario_silva, 18, faro).
 utente(2, raquel_guimaraes, 37, lisboa).
@@ -132,22 +165,6 @@ utente(13, paulo_antunes, 34, lisboa).
 utente(14, rita_moreira, 22, braga).
 utente(15, sara_paredes, 25, porto).
 utente(16, pedro_afonso, 67, porto).
-perfeito(1,u).
-perfeito(2,u).
-perfeito(3,u).
-perfeito(4,u).
-perfeito(5,u).
-perfeito(6,u).
-perfeito(7,u).
-perfeito(8,u).
-perfeito(9,u).
-perfeito(10,u).
-perfeito(11,u).
-perfeito(12,u).
-perfeito(13,u).
-perfeito(14,u).
-perfeito(15,u).
-perfeito(16,u).
 % -------------------------------------------------------
 % -------------- Conhecimento Imperfeito ----------------
 % ---------------------- Utente -------------------------
@@ -166,25 +183,11 @@ prestador(9, dr_igor_pereira, cardiologia, santa_maria).
 prestador(10, dr_marina_almeida, ginecologia, santo_antonio).
 prestador(11, dr_andre_carvalho, oftalmologia, sao_joao).
 prestador(12, dr_yasmin_barbosa, cirurgia_geral, cufe).
-perfeito(1,p).
-perfeito(2,p).
-perfeito(3,p).
-perfeito(4,p).
-perfeito(5,p).
-perfeito(6,p).
-perfeito(7,p).
-perfeito(8,p).
-perfeito(9,p).
-perfeito(10,p).
-perfeito(11,p).
-perfeito(12,p).
 % -------------------------------------------------------
 % -------------- Conhecimento Imperfeito ----------------
 % --------------------- Prestador -----------------------
 prestador(55, dr_maria_neves, noEspecialidade, trofa_saude).
-interdito(55,p).
 prestador(54, dr_ivo_moreira,medicina_geral, yyyy).
-incerto(54,p).
 
 %TODO: Add more
 
@@ -290,15 +293,9 @@ testa([H|T]) :- H, testa(T).
 
 +prestador(Id,Nome,Especialidade,Local) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,_,_,_) ; excecao(prestador(Id,_,_,_))),S ),
                                             comprimento( S,N ),
-<<<<<<< HEAD
-				                N==1).
-
-% Garantir que não existe conhecimento positivo contraditótio
-=======
 				                            N==1).
 
 % Garantir que não existe conhecimento positivo contraditótio
->>>>>>> develop
 % Não repetir conhecimento negativo
 +(-prestador( Id,Nome,Especialidade,Local )) :: ( solucoes( (Id), prestador(Id,Nome,Especialidade,Local), S ),
                             comprimento( S, N ),
@@ -327,6 +324,10 @@ testa([H|T]) :- H, testa(T).
 +prestador(Id,_,_,_) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,Nome,Especialidade,Local)),S ),
                                          comprimento( S,N ),
    			                             N==1).
+
++prestador(Id,Name,Especialidade, Local) :: (solucoes(Especialidade,(prestador(Id, Name,Especialidade,Local), nao(nulo(Especialidade))), L),
+                                            comprimento(L, N),
+                                            N==0).
 
 % -------------------------------------------------------
 % Invariante Referencial:  não permitir a remoção de utentes/prestadores
@@ -366,13 +367,13 @@ involucao( [OPT1 | R], impreciso ) :-
 
 involucao( [], impreciso ).
 
-involucao( prestador( Id,Nome,Especialidade,Local ), incerto, local) :-
+involucao( prestador( Id,Nome,Especialidade,_ ), incerto, local) :-
         involucao( prestador( Id,Nome,Especialidade,yyyy ), positivo ).
 
-involucao( prestador( Id,Nome,Especialidade,Local ), incerto, nome) :-
+involucao( prestador( Id,_,Especialidade,Local ), incerto, nome) :-
         involucao( prestador( Id,yyyy,Especialidade,Local ), positivo ).
 
-involucao( prestador( Id,Nome,Especialidade,Local ), incerto, especialidade) :-
+involucao( prestador( Id,Nome,_,Local ), incerto, especialidade) :-
         involucao( prestador( Id,Nome,yyyy,Local ), positivo ).
 
 involucao( prestador( Id,Nome,Especialidade,Local ), incerto, id) :-
@@ -384,7 +385,7 @@ involucao( prestador( Id,Nome,Especialidade,Local ), interdito, local) :-
 involucao( prestador( Id,Nome,Especialidade,Local ), interdito, nome) :-
         involucao( prestador( Id,noName,Especialidade,Local ), positivo ).
 
-involucao( prestador( Id,Nome,Especialidade,Local ), interdito, especialidade) :-
+involucao( prestador( Id,Nome,Especialidade,Local ), interdito, especialidade):-
         involucao( prestador( Id,Nome,noEspecialidade,Local ), positivo ).
 
 involucao( prestador( Id,Nome,Especialidade,Local ), interdito, id) :-
@@ -422,11 +423,10 @@ excecao(prestador(Id,Nome,Especialidade,_)) :- prestador(Id,Nome,Especialidade,y
 % Há um utente de id 100 com 22 anos da guarda que ou se chama maria ou joana
 excecao(utente(100,maria,22,guarda)).
 excecao(utente(100,joana,22,guarda)).
-impreciso(100,u).
 
 excecao(prestador(50,dr_paula_barros,cardiologia,sao_joao)).
 excecao(prestador(50,dr_paula_barros,infectologia,sao_joao)).
-impreciso(50,p).
+
 
 %TODO: Fazer para os outros.
 
@@ -438,7 +438,7 @@ excecao(cuidado(2017-12-30,16,3,osso_partido,150,65)).
 excecao(cuidado(2008-03-22,5,5,catarata,30,30)).
 excecao(cuidado(2015-05-03,6,10,menopausa,45,42)).
 excecao(cuidado(2017-12-30,9,6,pele_irritada,150,70)).
-)% ------------------------------------------------------
+% ------------------------------------------------------
 % -------------- Conhecimento Interdito ----------------
 % ------------------------------------------------------
 % Quando não se sabe nem nunca se vai saber algo de um utente
@@ -458,10 +458,6 @@ nulo(noDescricao).
 nulo(noCusto).
 nulo(noRating).
 nulo(noData).
-
-+prestador(Id,Name,Especialidade, Local) :: (solucoes(Especialidade,(prestador(Id, Name,Especialidade,Local), nao(nulo(Especialidade))), L),
-                                            comprimento(L, N),
-                                            N==0).
 
 %:- utente(Id, marta_silva, 39, faro), nao(nulo(Id)).
 %TODO: Fazer para os outros.
