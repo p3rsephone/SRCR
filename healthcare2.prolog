@@ -240,8 +240,8 @@ evolucao( prestador(Id,Nome,Especialidade,Local) , negativo ) :-
 evolucao( [prestador(Id,Nome,Especialidade,Local) | R], impreciso ) :-
     solucoes( Inv, imp(prestador(Id,Nome,Especialidade,Local))::Inv, L ),
     insercao(excecao(prestador(Id,Nome,Especialidade,Local) )),
-    testa(L),
     insercao(impreciso(Id,p)),
+    testa(L),
     apagarPrestador(Id),
     apagarIncerto(Id,p),
     evolucao( R,impreciso ).
@@ -616,7 +616,7 @@ imp(cuidado(Id,_,_,_,_,_,_)) :: (solucoes( (Id), (positivo(Id,c)),S ),
 				                N==0).
 
 % Impedir inserção de conhecimento repetido
-imp(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( (Id,Nome,Especialidade,Local), (prestador(Id,Nome, Especialidade, Local)),S ),
+imp(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( (Id,Nome,Especialidade,Local), (excecao(prestador(Id,Nome, Especialidade, Local))),S ),
                                             comprimento( S,N ),
 				                N==1).
 
