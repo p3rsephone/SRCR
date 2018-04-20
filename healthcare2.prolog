@@ -373,8 +373,8 @@ evolucao( cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) , negativo ) :-
 evolucao( [cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) | R], impreciso ) :-
     solucoes( Inv, imp(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating))::Inv, L ),
     insercao(excecao(cuidado(Id,Data,IdU,IdP,Tipo,Custo,Rating) )),
-    testa(L),
     insercao(impreciso(Id,c)),
+    testa(L),
     apagarCuidado(Id),
     apagarIncerto(Id,c),
     evolucao( R,impreciso ).
