@@ -47,7 +47,7 @@ conjuncao( desconhecido, verdadeiro, desconhecido ).
 conjuncao( verdadeiro, desconhecido, desconhecido ).
 
 %TODO: Pressuposto do mundo fechado de TUDO
-%       -utente(Id,N,I,S,C) :- 
+%       -utente(Id,N,I,S,C) :-
 %          nao(utente(Id,N,I,S,C)),
 %          nao(excecao(utente(Id,N,I,S,C))).
 
@@ -235,7 +235,7 @@ testa([H|T]) :- H, testa(T).
 %sem conhecimento interdito
 +prestador(Id,Nome,Especialidade,Local) :: (solucoes( Id, (interdito(Id,p)),S ),
                                             comprimento( S,N ),
-                                                        N==0). 
+                                                        N==0).
 
 % Garantir que não existe conhecimento positivo contraditótio
 +(-prestador( Id,_,_,_)) :: ( solucoes( (Id), positivo(Id,p), S ),
@@ -243,12 +243,12 @@ testa([H|T]) :- H, testa(T).
                             N == 0 ).
 
 % Não repetir conhecimento negativo
-+(-prestador( Id,_,_,_ )) :: ( solucoes( (Id), negativo(Id,p), S ),
++(-prestador( Id,Nome,Especialidade,Local)) :: ( solucoes( (Id,Nome,Especialidade,Local), -prestador(Id,Nome,Especialidade,Local), S ),
                             comprimento( S, N ),
                             N == 1 ).
 
 % Invariante que impede a inserção de conhecimento negativo acerca de conhecimento interdito sobre a especialidade de utentes
-+(-prestador(Id,Nome,Especialidade,Local)) :: (solucoes( Id, (interdito(Id,p)),S ),
++(-prestador(Id,_,_,_)) :: (solucoes( Id, (interdito(Id,p)),S ),
                                                 comprimento( S,N ),
 				                N==0).
 
@@ -258,7 +258,7 @@ inc(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( (Id,Nome,Especialidade
 
 imp(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( Id, (interdito(Id,p)),S ),
                                             comprimento( S,N ),
-                                                N==0). 
+                                                N==0).
 
 imp(prestador(Id,Nome,Especialidade,Local)) :: (solucoes( (Id,Nome,Especialidade,Local), (positivo(Id,p)),S ),
                                             comprimento( S,N ),
